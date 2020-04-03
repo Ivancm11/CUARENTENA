@@ -1,2 +1,0 @@
-heroku git:remote -a herokuAppName
-git push heroku master
