@@ -1,0 +1,11 @@
+name: CUARENTENA
+channels:
+  - conda-forge
+  - pytorch
+dependencies:
+  - python
+  - numpy
+  - pandas
+  - scikit-learn
+  - matplotlib 
+  - pytorch>=1.4.0
