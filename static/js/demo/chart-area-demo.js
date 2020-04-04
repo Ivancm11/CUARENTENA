@@ -31,7 +31,10 @@ function number_format(number, decimals, dec_point, thousands_sep) {
 var ctx = document.getElementById("myAreaChart");
 //Esto seria el JSON
 
-var testData = document.getElementById("DataSIR").innerHTML.substring(1).split(',');
+var testData = document.getElementById("DataSIR").innerHTML;
+testData.substring(1).split(',').map(function(i){
+  return parseInt(i, 10);
+});
 console.log(testData)
 console.log(type(testData))
 var myLineChart = new Chart(ctx, {
