@@ -54,7 +54,7 @@ var myLineChart = new Chart(ctx, {
       pointHoverBorderColor: "rgba(78, 115, 223, 1)",
       pointHitRadius: 10,
       pointBorderWidth: 2,
-      data: testData["infected"],
+      data: testData,
     },{
       label: "Susceptible",
       lineTension: 0.3,
@@ -68,7 +68,7 @@ var myLineChart = new Chart(ctx, {
       pointHoverBorderColor: "rgba(240, 52, 52, 1)",
       pointHitRadius: 10,
       pointBorderWidth: 2,
-      data: testData["susceptible"],
+      data: testData,
     },
     {
       label: "Removed",
@@ -83,7 +83,7 @@ var myLineChart = new Chart(ctx, {
       pointHoverBorderColor: "rgba(191, 191, 191, 1)",
       pointHitRadius: 10,
       pointBorderWidth: 2,
-      data: testData["removed"],
+      data: testData,
     },
   ],
   },
