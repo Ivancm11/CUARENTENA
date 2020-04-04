@@ -1,5 +1,4 @@
 from flask import Flask, redirect, url_for, render_template, request,jsonify
-import pandas as pd
 import numpy as np
 import json
 import os
