@@ -4,12 +4,16 @@ Chart.defaults.global.defaultFontColor = '#858796';
 
 // Pie Chart Example
 var ctx = document.getElementById("myPieChart");
+var testData = {"infected":[0,55,120,1000,10000,7700,6895,8000,6000,5500,3000,1090],"circulo":[500,23,123],"regions":{"cat":{
+  "population":{"x":[[4,5,6,7],[7,4,3,2]],
+                "y":[[4,5,6,7],[7,4,3,2]],   
+                "state":[[0,0,1,1],[]]}}}};
 var myPieChart = new Chart(ctx, {
   type: 'doughnut',
   data: {
     labels: ["Infected", "Recovered", "Uninfected"],
     datasets: [{
-      data: [55, 30, 15],
+      data: testData["circulo"],
       backgroundColor: ['#4e73df', '#1cc88a', '#36b9cc'],
       hoverBackgroundColor: ['#2e59d9', '#17a673', '#2c9faf'],
       hoverBorderColor: "rgba(234, 236, 244, 1)",

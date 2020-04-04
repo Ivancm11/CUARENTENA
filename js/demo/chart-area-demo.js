@@ -29,6 +29,13 @@ function number_format(number, decimals, dec_point, thousands_sep) {
 
 // Area Chart Example
 var ctx = document.getElementById("myAreaChart");
+//Esto seria el JSON
+//var testData = [0, 10000, 15000, 21000, 19000, 12000, 7000, 6000, 5250, 3000, 2000, 950];
+var testData = {"infected":[0,55,120,1000,10000,7700,6895,8000,6000,5500,3000,1090],"susceptible":[8000,6500,4200,4000,3000,200,6895,8000,6000,5500,3000,1090],
+"removed":[0,2,75,222,315,770,695,500,6000,5500,3000,1090],"circulo":[500,23,0],"regions":{"cat":{
+  "population":{"x":[[4,5,6,7],[7,4,3,2]],
+                "y":[[4,5,6,7],[7,4,3,2]],   
+                "state":[[0,0,1,1],[]]}}}};
 var myLineChart = new Chart(ctx, {
   type: 'line',
   data: {
@@ -46,8 +53,38 @@ var myLineChart = new Chart(ctx, {
       pointHoverBorderColor: "rgba(78, 115, 223, 1)",
       pointHitRadius: 10,
       pointBorderWidth: 2,
-      data: [0, 10000, 15000, 21000, 19000, 12000, 7000, 6000, 5250, 3000, 2000, 950],
-    }],
+      data: testData["infected"],
+    },{
+      label: "Susceptible",
+      lineTension: 0.3,
+      backgroundColor: "rgba(78, 115, 223, 0.05)",
+      borderColor: "rgba(240, 52, 52, 1)",
+      pointRadius: 3,
+      pointBackgroundColor: "rgba(240, 52, 52, 1)",
+      pointBorderColor: "rgba(240, 52, 52, 1)",
+      pointHoverRadius: 3,
+      pointHoverBackgroundColor: "rgba(240, 52, 52, 1))",
+      pointHoverBorderColor: "rgba(240, 52, 52, 1)",
+      pointHitRadius: 10,
+      pointBorderWidth: 2,
+      data: testData["susceptible"],
+    },
+    {
+      label: "Removed",
+      lineTension: 0.3,
+      backgroundColor: "rgba(78, 115, 223, 0.05)",
+      borderColor: "rgba(191, 191, 191, 1)",
+      pointRadius: 3,
+      pointBackgroundColor: "rgba(191, 191, 191, 1)",
+      pointBorderColor: "rgba(191, 191, 191, 1)",
+      pointHoverRadius: 3,
+      pointHoverBackgroundColor: "rgba(191, 191, 191, 1)",
+      pointHoverBorderColor: "rgba(191, 191, 191, 1)",
+      pointHitRadius: 10,
+      pointBorderWidth: 2,
+      data: testData["removed"],
+    },
+  ],
   },
   options: {
     maintainAspectRatio: false,

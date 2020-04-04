@@ -23,6 +23,13 @@
   <script src="/vendor/jquery/jquery.min.js"></script>
   <script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 
+    <!-- JSONES CUTRES-->
+    <script id="JSONData" type="application/json">{"infected":[0,55,120,1000,10000,7700,6895,8000,6000,5500,3000,1090],"susceptible":[8000,6500,4200,4000,3000,200,6895,8000,6000,5500,3000,1090],
+      "removed":[0,2,75,222,315,770,695,500,6000,5500,3000,1090],"circulo":[500,23,0],"regions":{"cat":{
+        "population":{"x":[[4,5,6,7,1,2,3,4],[4,0,1,5,1,5,2,4]],
+                      "y":[[0,8,0,8,0,5,1,2],[4,5,6,7,1,2,3,4]],   
+                      "state":[[0,0,1,1],[]]}}}}</script>
+
 </head>
 
 <body id="page-top">
@@ -55,7 +62,7 @@
               <div class="card shadow mb-4">
                 <!-- Card Header - Dropdown -->
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                  <h6 class="m-0 font-weight-bold text-primary">Simulation</h6>
+                  <h6 class="m-0 font-weight-bold text-primary">New infected</h6>
                   <div class="dropdown no-arrow">
                     <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                       <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
@@ -127,9 +134,12 @@
       <div class="wrapper">
 
         <div id="tester"></div>
-    
-        <div id="myDiv"></div>
-    
+        
+        <div class="row">        
+          <div id="myDiv" class="col-lg-4"></div>
+          <div id="myDiv2" class="col-lg-4"></div>
+        </div>
+
         <script>
           function getData(){
             return Math.random();
@@ -145,16 +155,18 @@
           }, 200);
         </script>
 
-        <script id="graficos" varUno='{"points": [5,6,7,8,9]}'>
-         var name = document.getElementById("graficos").getAttribute("varUno");
-          var n = 100;
-          var x = [], y = [], z = [];
+        <script id="graficos">
+         var inputData = document.getElementById("JSONData").innerHTML;
+          var n = 2;
+          var x = [], y = [], z = [],xx=[],yy=[];
           var dt = 0.015;
     
           for (i = 0; i < n; i++) {
             x[i] = Math.random() * 2 - 1;
             y[i] = Math.random() * 2 - 1;
             z[i] = 30 + Math.random() * 10;
+            xx[i] = 0;
+            yy[i] = 0;
           }
     
           Plotly.newPlot('myDiv', [{
@@ -163,7 +175,30 @@
             mode: 'markers'
           }], {
             xaxis: {range: [-40, 40]},
-            yaxis: {range: [0, 60]}
+            yaxis: {range: [0, 60]},
+            title: {
+                text:'Valencia',
+                font: {
+                  family: 'Courier New, monospace',
+                  size: 24
+              },
+              }
+          })
+
+          Plotly.newPlot('myDiv2', [{
+            x: x,
+            y: z,
+            mode: 'markers'
+          }], {
+            xaxis: {range: [-40, 40]},
+            yaxis: {range: [0, 60]},
+            title: {
+                text:'Catalunya',
+                font: {
+                  family: 'Courier New, monospace',
+                  size: 24
+              },
+              }
           })
     
           function compute () {
@@ -189,18 +224,45 @@
             }
           }
 
+          function computeV2(iter){   
+            for(var i = 0; i < n; i++){
+              xx[i] = puntosX[i][iter];
+              yy[i] = puntosY[i][iter];
+            }   
+
+          }
+
           function readJSON(json){
             var myObj = JSON.parse(json);
-            puntos = myObj['points'];
-            console.log(JSON.stringify(puntos));
+            puntosX = myObj['regions']['cat']['population']['x'];
+            puntosY = myObj['regions']['cat']['population']['y'];
+            console.log(JSON.stringify(puntosX));
           }
     
-          readJSON(name);
+          readJSON(inputData);
+          var t = 0;
+          var iter = 0;
           function update () {
             compute();
-    
+            computeV2(iter);
+            iter = iter+1;
+            if(iter == 5){
+              iter = 0;
+            }
             Plotly.animate('myDiv', {
-              data: [{x: x, y: z}]
+              data: [{x: xx, y: yy}]
+            }, {
+              transition: {
+                duration: 0
+              },
+              frame: {
+                duration: 10,
+                redraw: false
+              },
+
+            });
+            Plotly.animate('myDiv2', {
+              data: [{x: xx, y: yy}]
             }, {
               transition: {
                 duration: 0
@@ -210,7 +272,6 @@
                 redraw: false
               }
             });
-    
             requestAnimationFrame(update);
           }
     
@@ -247,7 +308,7 @@
   <script src="js/sb-admin-2.min.js"></script>
 
   <!-- Page level plugins -->
-  <script src="/chart.js/Chart.min.js"></script>
+  <script src="chart.js/Chart.min.js"></script>
 
   <!-- Page level custom scripts -->
   <script src="js/demo/chart-area-demo.js"></script>
