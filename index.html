@@ -133,11 +133,12 @@
 
       <div class="wrapper">
 
-        <div id="tester"></div>
+        <!--<div id="tester"></div> -->
         
         <div class="row">        
           <div id="myDiv" class="col-lg-4"></div>
           <div id="myDiv2" class="col-lg-4"></div>
+          <div id="myDiv3" class="col-lg-4"></div>
         </div>
 
         <script>
@@ -194,6 +195,23 @@
             yaxis: {range: [0, 60]},
             title: {
                 text:'Catalunya',
+                font: {
+                  family: 'Courier New, monospace',
+                  size: 24
+              },
+              }
+          })
+
+          
+          Plotly.newPlot('myDiv3', [{
+            x: x,
+            y: z,
+            mode: 'markers'
+          }], {
+            xaxis: {range: [-40, 40]},
+            yaxis: {range: [0, 60]},
+            title: {
+                text:'Andalucía',
                 font: {
                   family: 'Courier New, monospace',
                   size: 24
