@@ -37,7 +37,8 @@ var ctx = document.getElementById("myAreaChart");
                 "y":[[4,5,6,7],[7,4,3,2]],   
                 "state":[[0,0,1,1],[]]}}}};*/
 var testData = document.getElementById("DataSIR").innerHTML;
-var myLineChart = new Chart(ctx, {
+console.log(testData);
+/*var myLineChart = new Chart(ctx, {
   type: 'line',
   data: {
     labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
@@ -153,4 +154,4 @@ var myLineChart = new Chart(ctx, {
       }
     }
   }
-});
+});*/
