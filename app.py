@@ -1,4 +1,5 @@
-from flask import Flask, redirect, url_for, render_template, request
+from flask import Flask, redirect, url_for, render_template, request,jsonify
+import pandas as pd
 import numpy as np
 import json
 import os
@@ -11,21 +12,23 @@ def get_num_points(num_batch):
 
 def dumb_model():
    
-    dictionary={}
-    num_batch=80
-    num_points=3
-    for i in range(num_batch):
-        dictionary["Num_Batch_"+str(i)]={}
-        num_points=get_num_points(i)
-        for j in range(num_points):
-            dictionary["Num_Batch_"+str(i)]["Num_Point_"+str(j)]={}
-            dictionary["Num_Batch_"+str(i)]["Num_Point_"+str(j)]={}
-    for i in range(num_batch):
-        num_points=get_num_points(i)
-        for j in range(num_points):
-            point=np.random.rand(2,1)
-            dictionary["Num_Batch_"+str(i)]["Num_Point_"+str(j)]={'x1':point[0][0],'x2':point[1][0]}
-    json_data=json.dumps(dictionary)
+    # dictionary={}
+    # num_batch=80
+    # num_points=3
+    # for i in range(num_batch):
+    #     dictionary["Num_Batch_"+str(i)]={}
+    #     num_points=get_num_points(i)
+    #     for j in range(num_points):
+    #         dictionary["Num_Batch_"+str(i)]["Num_Point_"+str(j)]={}
+    #         dictionary["Num_Batch_"+str(i)]["Num_Point_"+str(j)]={}
+    # for i in range(num_batch):
+    #     num_points=get_num_points(i)
+    #     for j in range(num_points):
+    #         point=np.random.rand(2,1)
+    #         dictionary["Num_Batch_"+str(i)]["Num_Point_"+str(j)]={'x1':point[0][0],'x2':point[1][0]}
+    # json_data=json.dumps(dictionary)
+    with open('sim2.json') as json_file:
+        json_data = json.load(json_file)
     return json_data
     
 
@@ -40,7 +43,7 @@ def login():
         min_infected_aux=request.form["min_infected"]
         json_data=dumb_model()
 
-        return render_template("index.html",predictions=json_data)
+        return render_template('index.html',data_aux=json_data)
     else:
         return render_template("inputs.html")
 
