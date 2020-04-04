@@ -31,11 +31,12 @@ function number_format(number, decimals, dec_point, thousands_sep) {
 var ctx = document.getElementById("myAreaChart");
 //Esto seria el JSON
 //var testData = [0, 10000, 15000, 21000, 19000, 12000, 7000, 6000, 5250, 3000, 2000, 950];
-var testData = {"infected":[0,55,120,1000,10000,7700,6895,8000,6000,5500,3000,1090],"susceptible":[8000,6500,4200,4000,3000,200,6895,8000,6000,5500,3000,1090],
+/*var testData = {"infected":[0,55,120,1000,10000,7700,6895,8000,6000,5500,3000,1090],"susceptible":[8000,6500,4200,4000,3000,200,6895,8000,6000,5500,3000,1090],
 "removed":[0,2,75,222,315,770,695,500,6000,5500,3000,1090],"circulo":[500,23,0],"regions":{"cat":{
   "population":{"x":[[4,5,6,7],[7,4,3,2]],
                 "y":[[4,5,6,7],[7,4,3,2]],   
-                "state":[[0,0,1,1],[]]}}}};
+                "state":[[0,0,1,1],[]]}}}};*/
+var testData = document.getElementById("DataSIR").innerHTML;
 var myLineChart = new Chart(ctx, {
   type: 'line',
   data: {
