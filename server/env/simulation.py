@@ -31,6 +31,7 @@ class Simulator():
             pos = np.zeros((population[r], 3))
             if r == region_first_infected:
                 pos = np.zeros((population[r]+1, 3))
+                
 
             self.regions[r] = {
                                'S': population[r], 
@@ -44,10 +45,14 @@ class Simulator():
                                'isolated': False,
                                'pos': pos
                             }
+
+            if r == region_first_infected:
+                self.regions[r]['infection_time'] = np.array([0])
                     
         # add infected
         self.regions[region_first_infected]['I'] = 1
         self.get_contourf()
+        self.i = 0
 
     def mixture(self, means, sigmas, probs, n_samples):
         data = np.zeros((n_samples, 2))
@@ -98,6 +103,8 @@ class Simulator():
             I = self.mixture(reg_v['centers'], reg_v['density'], reg_v['policy'], self.regions[reg_k]['I'])
             R = self.mixture(reg_v['centers'], reg_v['density'], reg_v['policy'], self.regions[reg_k]['R'])
             
+            n_infected = 0
+
             for i in range(I.shape[0]):
                 dist = np.sqrt(np.sum((S - I[i,:])**2, axis=1))
 
@@ -109,19 +116,45 @@ class Simulator():
                 infected_individuals = S[infected, :]
                 I = np.concatenate([I, infected_individuals])
                 S = S[np.logical_not(infected), :]
+                
+                n_infected += sum(infected)
 
-                self.regions[reg_k]['S'] -= np.sum(infected)
-                self.regions[reg_k]['I'] += np.sum(infected)
+            self.regions[reg_k]['S'] -= n_infected #np.sum(infected)
+            self.regions[reg_k]['I'] += n_infected #np.sum(infected)
+
+            print(n_infected)
             
+            if 'infection_time' not in self.regions[reg_k].keys():
+                self.regions[reg_k]['infection_time'] = np.zeros(n_infected)
+            else:
+                self.regions[reg_k]['infection_time'] = np.concatenate([self.regions[reg_k]['infection_time'], np.zeros(n_infected)])
+            self.regions[reg_k]['infection_time'] += 1
+
+            steps_removed = 16
+            cured_or_dead = self.regions[reg_k]['infection_time'] > steps_removed
+
+            n_removed = np.sum(cured_or_dead)
+
+            self.regions[reg_k]['infection_time'] = self.regions[reg_k]['infection_time'][np.logical_not(cured_or_dead)]
+
+            self.regions[reg_k]['R'] += n_removed
+            self.regions[reg_k]['I'] -= n_removed
+
+            if R.shape[0] == 0 :
+                R = I[:n_removed,:]
+            else:
+                R = np.concatenate([R,  I[:n_removed,:]])
+
+            I = I[n_removed:, :]
+
             pos = np.concatenate([S, I, R])
             state = np.array([[0]* self.regions[reg_k]['S'] + [1]*self.regions[reg_k]['I'] + [2]*self.regions[reg_k]['R']]).T
             self.regions[reg_k]['pos'] = np.hstack((pos, state))
 
-
             # transition to other regions (if allowed)
             if not reg_v['isolated']:
-                max_travelers = int((self.regions[reg_k]['S'] + self.regions[reg_k]['I'] + self.regions[reg_k]['R'])*0.01) # only 10% 
-                travelers = np.random.randint(low=0, high=max(max_travelers, 0)) # max travelers
+                max_travelers = int((self.regions[reg_k]['S'] + self.regions[reg_k]['I'] + self.regions[reg_k]['R'])*0.01) # only 1% 
+                travelers = np.random.randint(low=0, high=max_travelers) # max travelers
                 label = ['S', 'I', 'R']
 
                 perc = np.array([self.regions[reg_k]['S'], self.regions[reg_k]['I'], self.regions[reg_k]['R']])
@@ -130,17 +163,38 @@ class Simulator():
                 perc = perc / norm
                 
                 if travelers > 0:
-                    traveller_status =  [int(p*travelers) for p in perc]# np.random.choice(3, travelers, p=p)
+                    traveller_status =  [int(p*travelers) for p in perc] # np.random.choice(3, travelers, p=p)
                     for i in range(3):
                         s = label[i]
                         travel_to = np.random.randint(low=0, high=len(self.regions))
+                        
                         self.regions[travel_to][s] += traveller_status[i]
                         self.regions[reg_k][s] -= traveller_status[i]
-            
-            for reg_k, reg_v in self.regions.items():
-                print('\n', reg_v['name'], reg_v['S'], reg_v['I'], reg_v['R'])
-                print(reg_v['pos'][:,2].mean())
+                        
+                        # move to the infectious time queue of travel_to
+                        if s == 'I':
+                            if 'infection_time' not in self.regions[travel_to].keys():
+                                self.regions[travel_to]['infection_time'] = self.regions[reg_k]['infection_time'][:traveller_status[i]]
+                            else:
+                                self.regions[travel_to]['infection_time'] = np.concatenate([self.regions[travel_to]['infection_time'], self.regions[reg_k]['infection_time'][:traveller_status[i]]])
 
+                            self.regions[reg_k]['infection_time'] = self.regions[reg_k]['infection_time'][traveller_status[i]:]
+                            print(traveller_status[i])
+                
+        total_S = 0
+        total_I = 0
+        total_R = 0
+        print('#######' + str(self.i) +'#######')
+        for reg_k, reg_v in self.regions.items():
+            print(reg_v['name'], reg_v['S'], reg_v['I'], reg_v['R'])
+            print(self.regions[reg_k]['infection_time'])
+
+            total_S += reg_v['S']
+            total_I += reg_v['I']
+            total_R += reg_v['R']
+        print('Total ', total_S, total_I, total_R)
+        print('##############')
+        self.i += 1
         return self.regions
 
 if __name__ == '__main__':
