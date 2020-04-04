@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Login Page{% endblock %}
+
+{% block content %}
+<form action="#" method="post">
+	<p>Name:</p>
+	<p><input type="text" name="nm" /></p>
+	<p>Percentage infected:</p>
+	<p><input type="text" name="percentage" /></p>
+	<p>Test capacity:</p>
+	<p><input type="text" name="capacity" /></p>
+	<p>Min infected to take measures:</p>
+	<p><input type="text" name="min_infected" /></p>
+	<p><input type="submit" value="submit"/></p>
+</form>
+{% endblock %}
