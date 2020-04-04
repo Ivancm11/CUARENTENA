@@ -41,7 +41,7 @@ def login():
         capacity_aux=request.form["capacity"]
         min_infected_aux=request.form["min_infected"]
         json_data=dumb_model()
-        Susceptible=json_data[0]['S']
+        Susceptible=json_data['0']['S']
 
 
         return render_template('index.html',data_aux=json_data,susceptible_cat=Susceptible)
