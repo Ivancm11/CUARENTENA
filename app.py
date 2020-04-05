@@ -7,7 +7,7 @@ os.environ["FLASK_ENV"]="deployment"
 app = Flask(__name__, static_folder='static', static_url_path='')
 
 class Simulator():
-    def __init__(self, population, names, sizes, UCI, region_first_infected, infection_radius, hygiene=0.4):
+    def __init__(self, population, names, sizes, UCI, region_first_infected, infection_radius, hygiene=0.2):
         self.regions = dict()
 
         self.hygiene = hygiene
@@ -124,7 +124,6 @@ class Simulator():
             self.regions[reg_k]['S'] -= n_infected #np.sum(infected)
             self.regions[reg_k]['I'] += n_infected #np.sum(infected)
 
-            
             
             if 'infection_time' not in self.regions[reg_k].keys():
                 self.regions[reg_k]['infection_time'] = np.zeros(n_infected)
@@ -255,7 +254,6 @@ class Simulator():
             nex_state = self.get_state()
 
             for i, reg_v in enumerate(self.regions.values()):
-                
                 total_S += reg_v['S']
                 total_I += reg_v['I']
                 total_R += reg_v['R']
@@ -268,13 +266,6 @@ class Simulator():
                 regions_resumed[i]['pos']['state'].append(reg_v['pos'][:,2].tolist())
 
 
-        
-        # plt.plot(regions_resumed[0]['S'], c='green')
-        # plt.plot(regions_resumed[0]['I'], c='red')
-        # plt.plot(regions_resumed[0]['R'], c='black')
-        # plt.legend(['Susceptible', 'Infected', 'Removed'])
-        # plt.savefig('curve.png', dpi=300)
-        # plt.show()
         
 
         return regions_resumed
