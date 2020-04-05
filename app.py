@@ -297,11 +297,11 @@ def agent(state):
 
 
 def model():
-    population = [700, 100, 100, 100]
-    names = ['CAT', 'MAD', 'AND', 'RIOJA']
-    sizes = [90, 100, 90, 100]
+    population = [50, 50, 50]
+    names = ['CAT', 'MAD', 'AND']
+    sizes = [90, 100, 90]
     
-    UCI = [9, 10, 9, 10]
+    UCI = [9, 10, 9]
 
 
     sim = Simulator(population, names, sizes, UCI, 0, 1, 0.3)
