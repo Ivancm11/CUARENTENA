@@ -1,11 +1,5 @@
-from flask import Flask, redirect, url_for, render_template, request,jsonify
 import numpy as np
 import json
-import os
-os.environ["FLASK_ENV"]="deployment"
-
-app = Flask(__name__, static_folder='static', static_url_path='')
-
 class Simulator():
     def __init__(self, population, names, sizes, UCI, region_first_infected, infection_radius, hygiene=0.2):
         self.regions = dict()
@@ -124,7 +118,7 @@ class Simulator():
             self.regions[reg_k]['S'] -= n_infected #np.sum(infected)
             self.regions[reg_k]['I'] += n_infected #np.sum(infected)
 
-            print(n_infected)
+            
             
             if 'infection_time' not in self.regions[reg_k].keys():
                 self.regions[reg_k]['infection_time'] = np.zeros(n_infected)
@@ -132,7 +126,7 @@ class Simulator():
                 self.regions[reg_k]['infection_time'] = np.concatenate([self.regions[reg_k]['infection_time'], np.zeros(n_infected)])
             self.regions[reg_k]['infection_time'] += 1
 
-            steps_removed = 17
+            steps_removed = 16
             cured_or_dead = self.regions[reg_k]['infection_time'] > steps_removed
 
             n_removed = np.sum(cured_or_dead)
@@ -194,37 +188,26 @@ class Simulator():
             state = state + [reg_v['S'], reg_v['I'], reg_v['R']]
         return state
 
-    def get_reward_terminal(self):
+    def get_reward(self):
         r = 0
-        terminal = 0
+        n_isolated = sum([reg_v['isolated'] for reg_v in self.regions.values()])
+        
+        mortality # a function of remaining 
 
-        size_isolated = sum([reg_v['isolated']*reg_v['size'] for reg_v in self.regions.values()])
+        n_dead = sum()
 
-        uci = np.array([reg_v['uci'] for reg_v in self.regions.values()])
-        infected = np.array([reg_v['uci'] for reg_v in self.regions.values()])
 
-        mortality = np.mean(infected/uci) # a function of remaining UCI
-
-        if sum([reg_v['I'] for reg_v in self.regions.values()]) == 0:
-            terminal = 1
-            r = 100
-
-        print( mortality, np.mean(infected) , size_isolated)
-
-        r += mortality + np.mean(infected) + size_isolated
-
-        return r, terminal
 
     def simulate(self, agent):
         total_S = 0
         total_I = 0
         total_R = 0
 
-        regions_resumed = dict()
+        regions_json = dict()
 
         # init
         for i, reg_v in enumerate(self.regions.values()):
-            regions_resumed[i] = {
+            regions_json[i] = {
                 'name':reg_v['name'],
                 'size':reg_v['size'],
                 'S': [reg_v['S']],
@@ -235,69 +218,39 @@ class Simulator():
                     'y':[],
                     'state':[]
                 }
-            }
 
+            }
         while total_R == 0 or total_I != 0:
             total_S = 0
             total_I = 0
             total_R = 0
 
             state = self.get_state()
-            reward, terminal = self.get_reward_terminal()
-
-            print(reward)
 
             actions = agent(state) # self.hygiene (0), self.radius, isolation (for region), p (region)
                                    # state self.S, self.I, self.R for regions
 
-            # TODO: Modify params
-
             self.step()
 
-            nex_state = self.get_state()
-
-            print('#######' + str(self.i) +'#######')
             for i, reg_v in enumerate(self.regions.values()):
-                print(reg_v['name'], reg_v['S'], reg_v['I'], reg_v['R'])
+                
                 total_S += reg_v['S']
                 total_I += reg_v['I']
                 total_R += reg_v['R']
-                
                 for k in ('S', 'I', 'R'):
-                    regions_resumed[i][k].append(int(reg_v[k]))
+                    regions_json[i][k].append(int(reg_v[k]))
 
-                regions_resumed[i]['pos']['x'].append(reg_v['pos'][:,0].tolist())
-                regions_resumed[i]['pos']['y'].append(reg_v['pos'][:,1].tolist())
-                regions_resumed[i]['pos']['state'].append(reg_v['pos'][:,2].tolist())
-
-            print('Total ', total_S, total_I, total_R)
-            print('##############')
-        
-        # plt.plot(regions_resumed[0]['S'], c='green')
-        # plt.plot(regions_resumed[0]['I'], c='red')
-        # plt.plot(regions_resumed[0]['R'], c='black')
-        # plt.legend(['Susceptible', 'Infected', 'Removed'])
-        # plt.savefig('curve.png', dpi=300)
-        # plt.show()
-        
-
-        return regions_resumed
+                regions_json[i]['pos']['x'].append(reg_v['pos'][:,0].tolist())
+                regions_json[i]['pos']['y'].append(reg_v['pos'][:,1].tolist())
+                regions_json[i]['pos']['state'].append(reg_v['pos'][:,2].tolist())
+           
+        for r in regions_json.keys():
+            for keys in regions_json[r].keys():
+                regions_json[r][keys] = str(regions_json[r][keys])   
+        return json.dumps(regions_json)
 
 def agent(state):
-    print(state)
     return []
-
-# if __name__ == '__main__':
-#     population = [700, 100, 100, 100]
-#     names = ['CAT', 'MAD', 'AND', 'RIOJA']
-#     sizes = [90, 100, 90, 100]
-    
-#     UCI = [9, 10, 9, 10]
-
-#     sim = Simulator(population, names, sizes, UCI, 0, 1, 0.3)
-#     sim.step()
-#     json_str = sim.simulate(agent)
-    
 
 
 
@@ -313,40 +266,4 @@ def model():
     sim.step()
     json_str = sim.simulate(agent)
     return json_str
-   
 
-    
-
-
-
-@app.route("/", methods=["POST", "GET"])
-def login():
-    if request.method == "POST":
-        user = request.form["nm"]
-        percentage_aux = request.form["percentage"]
-        capacity_aux=request.form["capacity"]
-        min_infected_aux=request.form["min_infected"]
-        json_data=model()
-        Susceptible=np.zeros(len(json_data[0]['S']))
-        Infected=np.zeros(len(json_data[0]['I']))
-        Recovered=np.zeros(len(json_data[0]['R']))
-        for region in json_data.keys():
-            Susceptible+=json_data[region]['S']
-            Infected+=json_data[region]['I']
-            Recovered+=json_data[region]['R']
-        Susceptible=list(Susceptible)
-        Infected=list(Infected)
-        Recovered=list(Recovered)
-
-
-
-
-        return render_template('index.html',data_aux=json_data,susceptible=Susceptible,infected=Infected,recovered=Recovered)
-    else:
-        return render_template("inputs.html")
-
-
-
-
-if __name__ == "__main__":
-    app.run(debug=False)
