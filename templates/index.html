@@ -174,7 +174,6 @@
           {{recoveredcatx}}
         </script>
 
-        
         <script id="ySusceptibleCat">
           {{susceptiblecaty}}
         </script>
@@ -183,6 +182,46 @@
         </script>
         <script id="yRemovedCat">
           {{recoveredcaty}}
+        </script>
+       
+        <script id="xSusceptibleAnd">
+          {{susceptibleandx}}
+        </script>
+        <script id="xInfectedAnd">
+          {{infectedandx}}
+        </script>
+        <script id="xRemovedAnd">
+          {{recoveredandx}}
+        </script>
+
+        <script id="ySusceptibleAnd">
+          {{susceptibleandy}}
+        </script>
+        <script id="yInfectedAnd">
+          {{infectedandy}}
+        </script>
+        <script id="yRemovedAnd">
+          {{recoveredandy}}
+        </script>
+
+        <script id="xSusceptibleVal">
+          {{susceptiblevalx}}
+        </script>
+        <script id="xInfectedVal">
+          {{infectedvalx}}
+        </script>
+        <script id="xRemovedVal">
+          {{recoveredvalx}}
+        </script>
+
+        <script id="ySusceptibleVal">
+          {{susceptiblevaly}}
+        </script>
+        <script id="yInfectedVal">
+          {{infectedvaly}}
+        </script>
+        <script id="yRemovedVal">
+          {{recoveredvaly}}
         </script>
 
         <script id="graficos">
@@ -205,6 +244,32 @@
           var yRemovedC=JSON.parse('{"test":'+document.getElementById("yRemovedCat").innerHTML+'}');
           yRemovedC = yRemovedC['test'];
 
+          var xSusceptibleA=JSON.parse('{"test":'+document.getElementById("xSusceptibleAnd").innerHTML+'}');
+          xSusceptibleA = xSusceptibleA['test'];
+          var xInfectedA=JSON.parse('{"test":'+document.getElementById("xInfectedAnd").innerHTML+'}');
+          xInfectedA = xInfectedA['test'];
+          var xRemovedA=JSON.parse('{"test":'+document.getElementById("xRemovedAnd").innerHTML+'}');
+          xRemovedA = xRemovedA['test'];
+          var ySusceptibleA=JSON.parse('{"test":'+document.getElementById("ySusceptibleAnd").innerHTML+'}');
+          ySusceptibleA = ySusceptibleA['test'];
+          var yInfectedA=JSON.parse('{"test":'+document.getElementById("yInfectedAnd").innerHTML+'}');
+          yInfectedA = yInfectedA['test'];
+          var yRemovedA=JSON.parse('{"test":'+document.getElementById("yRemovedAnd").innerHTML+'}');
+          yRemovedA = yRemovedA['test'];
+
+          var xSusceptibleV=JSON.parse('{"test":'+document.getElementById("xSusceptibleVal").innerHTML+'}');
+          xSusceptibleV = xSusceptibleV['test'];
+          var xInfectedV=JSON.parse('{"test":'+document.getElementById("xInfectedVal").innerHTML+'}');
+          xInfectedV = xInfectedV['test'];
+          var xRemovedV=JSON.parse('{"test":'+document.getElementById("xRemovedVal").innerHTML+'}');
+          xRemovedV = xRemovedV['test'];
+          var ySusceptibleV=JSON.parse('{"test":'+document.getElementById("ySusceptibleVal").innerHTML+'}');
+          ySusceptibleV = ySusceptibleV['test'];
+          var yInfectedV=JSON.parse('{"test":'+document.getElementById("yInfectedVal").innerHTML+'}');
+          yInfectedV = yInfectedV['test'];
+          var yRemovedV=JSON.parse('{"test":'+document.getElementById("yRemovedVal").innerHTML+'}');
+          yRemovedV = yRemovedV['test'];
+
           var susceptibleData = JSON.parse('{"test":'+document.getElementById("DataSusceptible").innerHTML+'}');
           susceptibleData=susceptibleData['test']
           var infectedData = JSON.parse('{"test":'+document.getElementById("DataInfected").innerHTML+'}');
@@ -216,6 +281,7 @@
           var x = [], y = [], z = [],xx=[],yy=[];
           var susceptibleAndX = [], susceptibleAndY=[], infectedAndX =[], infectedAndY=[], removedAndX = [], removedAndY=[];
           var susceptibleCatX = [], susceptibleCatY=[], infectedCatX =[], infectedCatY=[], removedCatX = [], removedCatY=[];
+          var susceptibleValX = [], susceptibleValY=[], infectedValX =[], infectedValY=[], removedValX = [], removedValY=[];
           var susceptible=0,infected=0,removed=0;
           var dt = 0.015;
     
@@ -406,7 +472,7 @@
               }
             },
           },], {
-            xaxis: {range: [-40, 40]},
+            xaxis: {range: [0, 50]},
             yaxis: {range: [0, 60]},
             title: {
                 text:'Andalucía',
@@ -437,18 +503,6 @@
             for(var i = 0; i < n; i++){
               xx[i] = xTestC[i][iter];
               yy[i] = xTestC[i][iter];
-              susceptibleAndX = [Math.random()*25*(Math.round(Math.random()) * 2 - 1),Math.random()*25*(Math.round(Math.random()) * 2 - 1),Math.random()*25*(Math.round(Math.random()) * 2 - 1),Math.random()*25*(Math.round(Math.random()) * 2 - 1),Math.random()*25*(Math.round(Math.random()) * 2 - 1),Math.random()*25*(Math.round(Math.random()) * 2 - 1),Math.random()*25*(Math.round(Math.random()) * 2 - 1),Math.random()*25*(Math.round(Math.random()) * 2 - 1),Math.random()*25*(Math.round(Math.random()) * 2 - 1),Math.random()*25*(Math.round(Math.random()) * 2 - 1),Math.random()*25*(Math.round(Math.random()) * 2 - 1),Math.random()*25*(Math.round(Math.random()) * 2 - 1)];
-              susceptibleAndY = [Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40];
-              infectedAndX = [Math.random()*25*(Math.round(Math.random()) * 2 - 1),Math.random()*25*(Math.round(Math.random()) * 2 - 1)];
-              infectedAndY = [Math.random()*40,Math.random()*40];
-              removedAndX = [Math.random()*25*(Math.round(Math.random()) * 2 - 1),Math.random()*25*(Math.round(Math.random()) * 2 - 1)];
-              removedAndY = [Math.random()*40,Math.random()*40];
-              //susceptibleCatX = [Math.random()*25*(Math.round(Math.random()) * 2 - 1),Math.random()*25*(Math.round(Math.random()) * 2 - 1),Math.random()*25*(Math.round(Math.random()) * 2 - 1),Math.random()*25*(Math.round(Math.random()) * 2 - 1),Math.random()*25*(Math.round(Math.random()) * 2 - 1),Math.random()*25*(Math.round(Math.random()) * 2 - 1),Math.random()*25*(Math.round(Math.random()) * 2 - 1),Math.random()*25*(Math.round(Math.random()) * 2 - 1),Math.random()*25*(Math.round(Math.random()) * 2 - 1),Math.random()*25*(Math.round(Math.random()) * 2 - 1),Math.random()*25*(Math.round(Math.random()) * 2 - 1),Math.random()*25*(Math.round(Math.random()) * 2 - 1)];
-              //susceptibleCatY = [Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40];
-              //infectedCatX = [Math.random()*25*(Math.round(Math.random()) * 2 - 1),Math.random()*25*(Math.round(Math.random()) * 2 - 1)];
-              //infectedCatY = [Math.random()*40,Math.random()*40];
-              //removedCatX = [Math.random()*25*(Math.round(Math.random()) * 2 - 1),Math.random()*25*(Math.round(Math.random()) * 2 - 1)];
-              //removedCatY = [Math.random()*40,Math.random()*40];
               susceptible = susceptibleData[iter];
               infected = infectedData[iter];
               removed = removedData[iter];
@@ -464,6 +518,32 @@
             for(var i=0;i<xRemovedC.length;i++){
               removedCatX[i] = xRemovedC[iter][i];
               removedCatY[i] = yRemovedC[iter][i];
+            }
+
+            for(var i=0;i<xSusceptibleA.length;i++){
+              susceptibleAndX[i] = xSusceptibleA[iter][i];
+              susceptibleAndY[i] = ySusceptibleA[iter][i];
+            }   
+            for(var i=0;i<xInfectedA.length;i++){
+              infectedAndX[i] = xInfectedA[iter][i];
+              infectedAndY[i] = yInfectedA[iter][i];
+            }
+            for(var i=0;i<xRemovedA.length;i++){
+              removedAndX[i] = xRemovedA[iter][i];
+              removedAndY[i] = yRemovedA[iter][i];
+            }
+
+            for(var i=0;i<xSusceptibleV.length;i++){
+              susceptibleValX[i] = xSusceptibleV[iter][i];
+              susceptibleValY[i] = ySusceptibleV[iter][i];
+            }   
+            for(var i=0;i<xInfectedV.length;i++){
+              infectedValX[i] = xInfectedV[iter][i];
+              infectedValY[i] = yInfectedV[iter][i];
+            }
+            for(var i=0;i<xRemovedV.length;i++){
+              removedValX[i] = xRemovedV[iter][i];
+              removedValY[i] = yRemovedV[iter][i];
             }
             var data_update = {
                 'marker.color': 'red'
@@ -502,11 +582,11 @@
           function update () {
             computeV2(iter);
             iter = iter+1;
-            if(iter == 99){
+            if(iter == xSusceptibleC.length){
               iter = 0;
             }
             Plotly.animate('myDiv', {
-              data: [{x: xx, y: yy}]
+              data: [{x: infectedValX, y: susceptibleValY},{x:susceptibleValX,y:susceptibleValY}, {x: removedValX, y: removedValY}]
             }, {
               transition: {
                 duration: 0
@@ -529,7 +609,7 @@
               }
             });
             Plotly.animate('myDiv3', {
-              data: [{x: susceptibleAndX, y: susceptibleAndY},{x:infectedAndX,y:infectedAndY}, {x: removedAndX, y: removedAndY}]
+              data: [{x: infectedAndX, y: infectedAndY},{x:susceptibleAndX,y:susceptibleAndY}, {x: removedAndX, y: removedAndY}]
             }, {
               transition: {
                 duration: 0
