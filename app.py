@@ -362,10 +362,26 @@ def login():
         Susceptible=list(Susceptible)
         Infected=list(Infected)
         Recovered=list(Recovered)
-        X_Cat=json_data[0]['pos']['x'])
+
+        Susceptible_cat=json_data[0]['S']
+        Infected_cat=json_data[0]['I']
+        Recovered_cat=json_data[0]['R']
+        X_Cat=json_data[0]['pos']['x']
+        Susceptible_cat_X=[]
+        Infected_cat_X=[]
+        Recovered_cat_X=[]
+        for i in range(len(X_Cat)-1):
+            infected_start=Susceptible_cat[i+1]
+            recovered_start=Susceptible_cat[i+1]+Infected_cat[i+1]
+            Susceptible_cat_X.append(X_Cat[i+1][:infected_start])
+            Infected_cat_X.append(X_Cat[i+1][infected_start:recovered_start])
+            Recovered_cat_X.append(X_Cat[i+1][recovered_start:])
 
 
-        return render_template('index.html',data_aux=json_data,susceptible=Susceptible,infected=Infected,recovered=Recovered,x_pos=X_Cat)
+
+
+
+        return render_template('index.html',data_aux=json_data,susceptible=Susceptible,infected=Infected,recovered=Recovered,x_pos=X_Cat,susceptible_cat=susceptible_cat_X,infected_cat=infected_cat_X,recovered_cat=recovered_cat_X)
     else:
         return render_template("inputs.html")
 
