@@ -124,7 +124,7 @@ class Simulator():
             self.regions[reg_k]['S'] -= n_infected #np.sum(infected)
             self.regions[reg_k]['I'] += n_infected #np.sum(infected)
 
-            print(n_infected)
+            
             
             if 'infection_time' not in self.regions[reg_k].keys():
                 self.regions[reg_k]['infection_time'] = np.zeros(n_infected)
@@ -209,7 +209,6 @@ class Simulator():
             terminal = 1
             r = 100
 
-        print( mortality, np.mean(infected) , size_isolated)
 
         r += mortality + np.mean(infected) + size_isolated
 
@@ -245,7 +244,6 @@ class Simulator():
             state = self.get_state()
             reward, terminal = self.get_reward_terminal()
 
-            print(reward)
 
             actions = agent(state) # self.hygiene (0), self.radius, isolation (for region), p (region)
                                    # state self.S, self.I, self.R for regions
@@ -256,7 +254,6 @@ class Simulator():
 
             nex_state = self.get_state()
 
-            print('#######' + str(self.i) +'#######')
             for i, reg_v in enumerate(self.regions.values()):
                 print(reg_v['name'], reg_v['S'], reg_v['I'], reg_v['R'])
                 total_S += reg_v['S']
@@ -270,8 +267,7 @@ class Simulator():
                 regions_resumed[i]['pos']['y'].append(reg_v['pos'][:,1].tolist())
                 regions_resumed[i]['pos']['state'].append(reg_v['pos'][:,2].tolist())
 
-            print('Total ', total_S, total_I, total_R)
-            print('##############')
+
         
         # plt.plot(regions_resumed[0]['S'], c='green')
         # plt.plot(regions_resumed[0]['I'], c='red')
@@ -284,7 +280,6 @@ class Simulator():
         return regions_resumed
 
 def agent(state):
-    print(state)
     return []
 
 # if __name__ == '__main__':
