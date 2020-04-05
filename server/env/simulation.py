@@ -1,11 +1,11 @@
-
 import numpy as np
 import json
 from viz import VizEnv
 
+import matplotlib.pyplot as plt
 
 class Simulator():
-    def __init__(self, population, names, sizes, region_first_infected, infection_radius, hygiene=0.2):
+    def __init__(self, population, names, sizes, UCI, region_first_infected, infection_radius, hygiene=0.2):
         self.regions = dict()
 
         self.hygiene = hygiene
@@ -32,12 +32,12 @@ class Simulator():
             if r == region_first_infected:
                 pos = np.zeros((population[r]+1, 3))
                 
-
             self.regions[r] = {
                                'S': population[r], 
                                'I':0, 
                                'R':0, 
                                'name': names[r], 
+                               'uci': UCI[r],
                                'size': sizes[r],
                                'centers': mean,
                                'density': density,
@@ -139,7 +139,7 @@ class Simulator():
 
             self.regions[reg_k]['R'] += n_removed
             self.regions[reg_k]['I'] -= n_removed
-
+            
             if R.shape[0] == 0 :
                 R = I[:n_removed,:]
             else:
@@ -179,36 +179,111 @@ class Simulator():
                                 self.regions[travel_to]['infection_time'] = np.concatenate([self.regions[travel_to]['infection_time'], self.regions[reg_k]['infection_time'][:traveller_status[i]]])
 
                             self.regions[reg_k]['infection_time'] = self.regions[reg_k]['infection_time'][traveller_status[i]:]
-                            print(traveller_status[i])
                 
         total_S = 0
         total_I = 0
         total_R = 0
-        print('#######' + str(self.i) +'#######')
-        for reg_k, reg_v in self.regions.items():
-            print(reg_v['name'], reg_v['S'], reg_v['I'], reg_v['R'])
-            print(self.regions[reg_k]['infection_time'])
-
-            total_S += reg_v['S']
-            total_I += reg_v['I']
-            total_R += reg_v['R']
-        print('Total ', total_S, total_I, total_R)
-        print('##############')
         self.i += 1
         return self.regions
+
+    def get_state(self):
+        state = []
+        for reg_v in self.regions.values():
+            state = state + [reg_v['S'], reg_v['I'], reg_v['R']]
+        return state
+
+    def get_reward(self):
+        r = 0
+        n_isolated = sum([reg_v['isolated'] for reg_v in self.regions.values()])
+        
+        mortality # a function of remaining 
+
+        n_dead = sum()
+
+
+
+    def simulate(self, agent):
+        total_S = 0
+        total_I = 0
+        total_R = 0
+
+        regions_json = dict()
+
+        # init
+        for i, reg_v in enumerate(self.regions.values()):
+            regions_json[i] = {
+                'name':reg_v['name'],
+                'size':reg_v['size'],
+                'S': [reg_v['S']],
+                'I': [reg_v['I']],
+                'R': [0],
+                'pos': {
+                    'x':[],
+                    'y':[],
+                    'state':[]
+                }
+
+            }
+        while total_R == 0 or total_I != 0:
+            total_S = 0
+            total_I = 0
+            total_R = 0
+
+            state = self.get_state()
+
+            actions = agent(state) # self.hygiene (0), self.radius, isolation (for region), p (region)
+                                   # state self.S, self.I, self.R for regions
+
+            self.step()
+
+            print('#######' + str(self.i) +'#######')
+            for i, reg_v in enumerate(self.regions.values()):
+                print(reg_v['name'], reg_v['S'], reg_v['I'], reg_v['R'])
+                total_S += reg_v['S']
+                total_I += reg_v['I']
+                total_R += reg_v['R']
+                for k in ('S', 'I', 'R'):
+                    regions_json[i][k].append(int(reg_v[k]))
+
+                regions_json[i]['pos']['x'].append(reg_v['pos'][:,0].tolist())
+                regions_json[i]['pos']['y'].append(reg_v['pos'][:,1].tolist())
+                regions_json[i]['pos']['state'].append(reg_v['pos'][:,2].tolist())
+
+            print('Total ', total_S, total_I, total_R)
+            print('##############')
+            
+        plt.plot(regions_json[0]['S'], c='green')
+        plt.plot(regions_json[0]['I'], c='red')
+        plt.plot(regions_json[0]['R'], c='black')
+        plt.legend(['Susceptible', 'Infected', 'Removed'])
+        plt.savefig('curve.png', dpi=300)
+        plt.show()
+        
+
+        return json.dumps(regions_json)
+
+def agent(state):
+    print(state)
+    return []
 
 if __name__ == '__main__':
     population = [700, 100, 100, 100]
     names = ['CAT', 'MAD', 'AND', 'RIOJA']
     sizes = [90, 100, 90, 100]
+    
+    UCI = [9, 10, 9, 10]
 
-    sim = Simulator(population, names, sizes, 0, 1, 0.3)
+
+    sim = Simulator(population, names, sizes, UCI, 0, 1, 0.3)
     sim.step()
+    json_str = sim.simulate(agent)
+    
+    with open('sim.json', '+w') as f:
+        f.write(json_str)
+    # n_rows = 2
+    # n_columns = 2 #int(np.ceil(len(population)/n_rows))
 
-    n_rows = 2
-    n_columns = 2 #int(np.ceil(len(population)/n_rows))
-
-    vis = VizEnv(n_rows, n_columns, sim.regions, sim.step)
-    vis.show(100)
+    # vis = VizEnv(n_rows, n_columns, sim.regions, sim.step)
+    # vis.show(100)
 
 
