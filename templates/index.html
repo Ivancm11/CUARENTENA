@@ -160,11 +160,16 @@
         <script id="DataRecovered">
           {{recovered}}
         </script>
+        <script id="xTest">
+          {{x_pos}}
+        </script>
 
         <script id="graficos">
           //var susceptibleData =[15,11, 9,8,7,15,16,23,40,77,100];
           //var infectedData =[0,4,6,5,2,15,16,23,40,77,100];
           //var removedData =[0,0,0,1,5,5,16,23,40,77,100];
+          var xTestC=JSON.parse('{"test":'+document.getElementById("xTest").innerHTML+'}');
+          xTestC = xTestC['test'];
           var susceptibleData = JSON.parse('{"test":'+document.getElementById("DataSusceptible").innerHTML+'}');
           susceptibleData=susceptibleData['test']
           var infectedData = JSON.parse('{"test":'+document.getElementById("DataInfected").innerHTML+'}');
@@ -172,7 +177,7 @@
           var removedData = JSON.parse('{"test":'+document.getElementById("DataRecovered").innerHTML+'}');
           removedData=removedData['test']
           var inputData = document.getElementById("JSONData").innerHTML;
-          var n = 2;
+          var n = 20;
           var x = [], y = [], z = [],xx=[],yy=[];
           var susceptibleAndX = [], susceptibleAndY=[], infectedAndX =[], infectedAndY=[], removedAndX = [], removedAndY=[];
           var susceptibleCatX = [], susceptibleCatY=[], infectedCatX =[], infectedCatY=[], removedCatX = [], removedCatY=[];
@@ -243,8 +248,8 @@
               }
             },
           },], {
-            xaxis: {range: [-40, 40]},
-            yaxis: {range: [0, 60]},
+            xaxis: {range: [0, 50]},
+            yaxis: {range: [-20, 60]},
             title: {
                 text:'Valencia',
                 font: {
@@ -393,11 +398,11 @@
             showlegend: false};
 
           Plotly.newPlot('myDiv4', data, layout, {displayModeBar: false});
-
           function computeV2(iter){   
             for(var i = 0; i < n; i++){
-              xx[i] = puntosX[i][iter];
-              yy[i] = puntosY[i][iter];
+              xx[i] = xTestC[i][iter];
+              console.log(xTestC[i][iter]);
+              yy[i] = xTestC[i][iter];
               susceptibleAndX = [Math.random()*25*(Math.round(Math.random()) * 2 - 1),Math.random()*25*(Math.round(Math.random()) * 2 - 1),Math.random()*25*(Math.round(Math.random()) * 2 - 1),Math.random()*25*(Math.round(Math.random()) * 2 - 1),Math.random()*25*(Math.round(Math.random()) * 2 - 1),Math.random()*25*(Math.round(Math.random()) * 2 - 1),Math.random()*25*(Math.round(Math.random()) * 2 - 1),Math.random()*25*(Math.round(Math.random()) * 2 - 1),Math.random()*25*(Math.round(Math.random()) * 2 - 1),Math.random()*25*(Math.round(Math.random()) * 2 - 1),Math.random()*25*(Math.round(Math.random()) * 2 - 1),Math.random()*25*(Math.round(Math.random()) * 2 - 1)];
               susceptibleAndY = [Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40];
               infectedAndX = [Math.random()*25*(Math.round(Math.random()) * 2 - 1),Math.random()*25*(Math.round(Math.random()) * 2 - 1)];
@@ -451,7 +456,7 @@
           function update () {
             computeV2(iter);
             iter = iter+1;
-            if(iter == 250){
+            if(iter == 100){
               iter = 0;
             }
             Plotly.animate('myDiv', {
