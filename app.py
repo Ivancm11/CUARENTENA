@@ -255,7 +255,7 @@ class Simulator():
             nex_state = self.get_state()
 
             for i, reg_v in enumerate(self.regions.values()):
-                print(reg_v['name'], reg_v['S'], reg_v['I'], reg_v['R'])
+                
                 total_S += reg_v['S']
                 total_I += reg_v['I']
                 total_R += reg_v['R']
