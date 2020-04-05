@@ -169,6 +169,7 @@
           var inputData = document.getElementById("JSONData").innerHTML;
           var n = 2;
           var x = [], y = [], z = [],xx=[],yy=[];
+          var susceptibleAndX = [], susceptibleAndY=[], infectedAndX =[], infectedAndY=[], removedAndX = [], removedAndY=[];
           var susceptible=0,infected=0,removed=0;
           var dt = 0.015;
     
@@ -178,6 +179,12 @@
             z[i] = 30 + Math.random() * 10;
             xx[i] = 0;
             yy[i] = 0;
+            susceptibleAndX[i] = 0;
+            susceptibleAndY[i] = 0;
+            infectedAndX[i] = 0;
+            infectedAndY[i] = 0;
+            removedAndX[i] = 0;
+            removedAndY[i] = 0;
             susceptible = 0;
             infected = 0;
             removed= 0;
@@ -217,14 +224,29 @@
 
           
           Plotly.newPlot('myDiv3', [{
-            x: x,
-            y: z,
+            x: susceptibleAndX,
+            y: susceptibleAndY,
+            name : 'Infected',
             mode: 'markers',
             marker: {
-              color: 'rgb(17, 157, 255)',
-              size: 50,
+              color: 'rgb(250,128,114)',
+              size: 14,
               line: {
-                color: 'rgb(231, 99, 250)',
+                color: 'rgb(0, 0, 0)',
+                width: 2
+              }
+            },
+          },
+          {
+            x: x,
+            y: [2],
+            name : 'Susceptible',
+            mode: 'markers',
+            marker: {
+              color: 'rgb(81, 193, 46)',
+              size: 14,
+              line: {
+                color: 'rgb(0, 0, 0)',
                 width: 2
               }
             },
@@ -233,15 +255,16 @@
             x: x,
             y: [2],
             mode: 'markers',
+            name : 'Removed',
             marker: {
-              color: 'rgb(50, 50, 120)',
-              size: 50,
+              color: 'rgb(25, 25, 25)',
+              size: 14,
               line: {
-                color: 'rgb(231, 99, 250)',
+                color: 'rgb(0, 0, 0)',
                 width: 2
               }
             },
-          }], {
+          },], {
             xaxis: {range: [-40, 40]},
             yaxis: {range: [0, 60]},
             title: {
@@ -273,6 +296,12 @@
             for(var i = 0; i < n; i++){
               xx[i] = puntosX[i][iter];
               yy[i] = puntosY[i][iter];
+              susceptibleAndX = [Math.random()*25*(Math.round(Math.random()) * 2 - 1),Math.random()*25*(Math.round(Math.random()) * 2 - 1)];
+              susceptibleAndY = [Math.random()*40,Math.random()*40];
+              infectedAndX = [Math.random()*25*(Math.round(Math.random()) * 2 - 1),Math.random()*25*(Math.round(Math.random()) * 2 - 1)];
+              infectedAndY = [Math.random()*40,Math.random()*40];
+              removedAndX = [Math.random()*25*(Math.round(Math.random()) * 2 - 1),Math.random()*25*(Math.round(Math.random()) * 2 - 1)];
+              removedAndY = [Math.random()*40,Math.random()*40];
               susceptible = susceptibleData[iter];
               infected = infectedData[iter];
               removed = removedData[iter];
@@ -323,13 +352,13 @@
               }
             });
             Plotly.animate('myDiv3', {
-              data: [{x: xx, y: yy}]
+              data: [{x: susceptibleAndX, y: susceptibleAndY},{x:infectedAndX,y:infectedAndY}, {x: removedAndX, y: removedAndY}]
             }, {
               transition: {
                 duration: 0
               },
               frame: {
-                duration: 100,
+                duration: 120,
                 redraw: false
               }
             });
