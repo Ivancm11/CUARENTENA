@@ -31,9 +31,10 @@
                       "state":[[0,0,1,1],[]]}}}}</script>
   <script>
     var json_aux={{ data_aux|safe }};
-  console.log(json_aux)
+    console.log(json_aux);
     var json_aux2={{ susceptible_cat|safe }};
-    console.log(json_aux2)</script>                   
+    console.log(json_aux2);
+  </script>                   
                       
         
 </head>
@@ -162,9 +163,12 @@
             </script>
 
         <script id="graficos">
-         var inputData = document.getElementById("JSONData").innerHTML;
+          var susceptibleData =[0,5,6,10,11,15,16,23,40,77,100];
+          var infectedData =[0,5,6,10,11,15,16,23,40,77,100];
+          var removedData =[0,5,6,10,11,15,16,23,40,77,100];
+          var inputData = document.getElementById("JSONData").innerHTML;
           var n = 2;
-          var x = [], y = [], z = [],xx=[],yy=[];
+          var x = [], y = [], z = [],xx=[],yy=[],susceptible=[],infected=[],removed=[];
           var dt = 0.015;
     
           for (i = 0; i < n; i++) {
@@ -173,6 +177,9 @@
             z[i] = 30 + Math.random() * 10;
             xx[i] = 0;
             yy[i] = 0;
+            susceptible[i] = 0;
+            infected[i] = 0;
+            removed[i] = 0;
           }
     
           Plotly.newPlot('myDiv', [{
@@ -267,6 +274,9 @@
             for(var i = 0; i < n; i++){
               xx[i] = puntosX[i][iter];
               yy[i] = puntosY[i][iter];
+              susceptible[i] = susceptibleData[iter];
+              infected[i] = infectedData[iter];
+              removed[i] = removedData[iter];
             }   
 
           }
@@ -275,7 +285,10 @@
             var myObj = JSON.parse(json);
             puntosX = myObj['regions']['cat']['population']['x'];
             puntosY = myObj['regions']['cat']['population']['y'];
-            console.log(JSON.stringify(puntosX));
+            susceptibleData = susceptibleData;
+            infectedData = infectedData;
+            removedData = removedData;
+            console.log(JSON.stringify(susceptibleData));
           }
     
           readJSON(inputData);
@@ -312,13 +325,13 @@
               }
             });
             Plotly.animate('myDiv4', {
-              data: [{x: xx, y: yy}]
+              data: [{x: susceptible, y: infected, z:removed}]
             }, {
               transition: {
                 duration: 0
               },
               frame: {
-                duration: 10,
+                duration: 500,
                 redraw: false
               }
             });
