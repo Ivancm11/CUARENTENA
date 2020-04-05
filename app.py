@@ -327,7 +327,7 @@ def agent(state):
 
 
 def model():
-    population = [100,100,100]
+    population = [150,150,150]
     names = ['CAT', 'MAD', 'AND']
     sizes = [45, 50, 45]
     

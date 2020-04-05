@@ -38,39 +38,41 @@ var Infected=Infected['test']
 var Recovered = JSON.parse('{"test":'+document.getElementById("DataRecovered").innerHTML+'}');
 var Recovered=Recovered['test']
 
+var size = Recovered.length;
+var labelsData = new Array(size).fill(0);
 
 
 var myLineChart = new Chart(ctx, {
   type: 'line',
   data: {
-    labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec","Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec","Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec","Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec","Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec","Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+    labels: labelsData,
     datasets: [{
       label: "Infected",
       lineTension: 0.3,
       backgroundColor: "rgba(78, 115, 223, 0.05)",
       borderColor: "rgba(240, 52, 52, 1)",
-      pointRadius: 3,
+      pointRadius: 1,
       pointBackgroundColor: "rgba(240, 52, 52, 1)",
       pointBorderColor: "rgba(240, 52, 52, 1)",
-      pointHoverRadius: 3,
+      pointHoverRadius: 1,
       pointHoverBackgroundColor: "rgba(240, 52, 52, 1)",
       pointHoverBorderColor: "rgba(240, 52, 52, 1)",
-      pointHitRadius: 10,
-      pointBorderWidth: 2,
+      pointHitRadius: 1,
+      pointBorderWidth: 1,
       data: Infected,
     },{
       label: "Susceptible",
       lineTension: 0.3,
       backgroundColor: "rgba(78, 115, 223, 0.05)",
       borderColor: "rgba(0, 177, 106, 1)",
-      pointRadius: 3,
+      pointRadius: 1,
       pointBackgroundColor: "rgba(0, 177, 106, 1)",
       pointBorderColor: "rgba(0, 177, 106, 1)",
-      pointHoverRadius: 3,
+      pointHoverRadius: 1,
       pointHoverBackgroundColor: "rgba(0, 177, 106, 1)",
       pointHoverBorderColor: "rgba(0, 177, 106, 1)",
-      pointHitRadius: 10,
-      pointBorderWidth: 2,
+      pointHitRadius: 1,
+      pointBorderWidth: 1,
       data: Susceptible,
     },
     {
@@ -78,14 +80,14 @@ var myLineChart = new Chart(ctx, {
       lineTension: 0.3,
       backgroundColor: "rgba(78, 115, 223, 0.05)",
       borderColor: "rgba(0, 0, 0, 1)",
-      pointRadius: 3,
+      pointRadius: 1,
       pointBackgroundColor: "rgba(0, 0, 0, 1)",
       pointBorderColor: "rgba(0, 0, 0, 1)",
-      pointHoverRadius: 3,
+      pointHoverRadius: 1,
       pointHoverBackgroundColor: "rgba(0, 0, 0, 1)",
       pointHoverBorderColor: "rgba(0, 0, 0, 1)",
-      pointHitRadius: 10,
-      pointBorderWidth: 2,
+      pointHitRadius: 1,
+      pointBorderWidth: 1,
       data: Recovered,
     },
   ],
