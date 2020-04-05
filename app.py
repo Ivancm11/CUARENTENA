@@ -273,7 +273,7 @@ class Simulator():
                 }
             }
 
-        while total_R < 50 or total_I > 5:
+        while total_R < 50 or total_I > 0:
             total_S = 0
             total_I = 0
             total_R = 0
@@ -329,12 +329,12 @@ def agent(state):
 def model():
     population = [100,100,100]
     names = ['CAT', 'MAD', 'AND']
-    sizes = [90, 100, 90]
+    sizes = [45, 50, 45]
     
     UCI = [9, 10, 9]
 
 
-    sim = Simulator(population, names, sizes, UCI, 0, 1, 0.3)
+    sim = Simulator(population, names, sizes, UCI, 0, 1, 0.5)
     sim.step()
     json_str = sim.simulate(agent)
     return json_str
