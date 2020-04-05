@@ -31,12 +31,15 @@ function number_format(number, decimals, dec_point, thousands_sep) {
 var ctx = document.getElementById("myAreaChart");
 //Esto seria el JSON
 
-var testData = document.getElementById("DataSIR").innerHTML;
-testData.substring(1).split(',').map(function(i){
-  return parseInt(i, 10);
-});
-console.log(testData)
-console.log(type(testData))
+var Susceptible = JSON.parse('{"test":'+document.getElementById("DataSusceptible").innerHTML+'}');
+var Susceptible=Susceptible['test']
+var Infected = JSON.parse('{"test":'+document.getElementById("DataInfected").innerHTML+'}');
+var Infected=Infected['test']
+var Recovered = JSON.parse('{"test":'+document.getElementById("DataRecovered").innerHTML+'}');
+var Recovered=Recovered['test']
+
+
+
 var myLineChart = new Chart(ctx, {
   type: 'line',
   data: {
@@ -54,7 +57,7 @@ var myLineChart = new Chart(ctx, {
       pointHoverBorderColor: "rgba(78, 115, 223, 1)",
       pointHitRadius: 10,
       pointBorderWidth: 2,
-      data: testData,
+      data: Infected,
     },{
       label: "Susceptible",
       lineTension: 0.3,
@@ -68,7 +71,7 @@ var myLineChart = new Chart(ctx, {
       pointHoverBorderColor: "rgba(240, 52, 52, 1)",
       pointHitRadius: 10,
       pointBorderWidth: 2,
-      data: testData,
+      data: Susceptible,
     },
     {
       label: "Removed",
@@ -83,7 +86,7 @@ var myLineChart = new Chart(ctx, {
       pointHoverBorderColor: "rgba(191, 191, 191, 1)",
       pointHitRadius: 10,
       pointBorderWidth: 2,
-      data: testData,
+      data: Recovered,
     },
   ],
   },

@@ -112,8 +112,8 @@
                 </div>
                 <!-- Card Body -->
                 <div class="card-body">
-                  <div class="chart-pie pt-4 pb-2">
-                    <canvas id="myPieChart"></canvas>
+                  <div class="wrapper">
+                    <div id="myDiv4"></div>
                   </div>
                   <div class="mt-4 text-center small">
                     <span class="mr-2">
@@ -162,9 +162,16 @@
           }, 200);
         </script>
 
-        <script id="DataSIR">
+        <script id="DataSusceptible">
           {{susceptible_cat}}
         </script>
+          <script id="DataInfected">
+            {{infected_cat}}
+          </script>
+            <script id="DataRecovered">
+              {{recovered_cat}}
+            </script>
+
         <script id="graficos">
          var inputData = document.getElementById("JSONData").innerHTML;
           var n = 2;
@@ -227,6 +234,19 @@
               },
               }
           })
+
+          var data = [
+            {
+              x: ['giraffes', 'orangutans'],
+              y: [20, 14],
+              type: 'bar'
+            }
+          ];
+
+          Plotly.newPlot('myDiv4', data);
+
+
+
     
           function compute () {
             var s = 10, b = 8/3, r = 28;
@@ -289,6 +309,17 @@
 
             });
             Plotly.animate('myDiv2', {
+              data: [{x: xx, y: yy}]
+            }, {
+              transition: {
+                duration: 0
+              },
+              frame: {
+                duration: 10,
+                redraw: false
+              }
+            });
+            Plotly.animate('myDiv4', {
               data: [{x: xx, y: yy}]
             }, {
               transition: {

@@ -42,9 +42,11 @@ def login():
         min_infected_aux=request.form["min_infected"]
         json_data=dumb_model()
         Susceptible=json_data['0']['S']
+        Infected=json_data['0']['I']
+        Recovered=json_data['0']['R']
 
 
-        return render_template('index.html',data_aux=json_data,susceptible_cat=Susceptible)
+        return render_template('index.html',data_aux=json_data,susceptible_cat=Susceptible,infected_cat=Infected,recovered_cat=Recovered)
     else:
         return render_template("inputs.html")
 
