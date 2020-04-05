@@ -362,30 +362,33 @@ def login():
         Susceptible=list(Susceptible)
         Infected=list(Infected)
         Recovered=list(Recovered)
-<<<<<<< HEAD
-=======
-        X_Cat=json_data[0]['pos']['x']
->>>>>>> 0e295b2fd7923cc040daa87157b60802734ac73e
 
         Susceptible_cat=json_data[0]['S']
         Infected_cat=json_data[0]['I']
         Recovered_cat=json_data[0]['R']
         X_Cat=json_data[0]['pos']['x']
+        Y_Cat=json_data[0]['pos']['y']
         Susceptible_cat_X=[]
         Infected_cat_X=[]
         Recovered_cat_X=[]
+        Susceptible_cat_Y=[]
+        Infected_cat_Y=[]
+        Recovered_cat_Y=[]
         for i in range(len(X_Cat)-1):
             infected_start=Susceptible_cat[i+1]
             recovered_start=Susceptible_cat[i+1]+Infected_cat[i+1]
             Susceptible_cat_X.append(X_Cat[i+1][:infected_start])
             Infected_cat_X.append(X_Cat[i+1][infected_start:recovered_start])
             Recovered_cat_X.append(X_Cat[i+1][recovered_start:])
+            Susceptible_cat_Y.append(Y_Cat[i+1][:infected_start])
+            Infected_cat_Y.append(Y_Cat[i+1][infected_start:recovered_start])
+            Recovered_cat_Y.append(Y_Cat[i+1][recovered_start:])
 
 
 
 
 
-        return render_template('index.html',data_aux=json_data,susceptible=Susceptible,infected=Infected,recovered=Recovered,x_pos=X_Cat,susceptible_cat=susceptible_cat_X,infected_cat=infected_cat_X,recovered_cat=recovered_cat_X)
+        return render_template('index.html',data_aux=json_data,susceptible=Susceptible,infected=Infected,recovered=Recovered,x_pos=X_Cat,susceptiblecatx=susceptible_cat_X,infectedcatx=infected_cat_X,recoveredcatx=recovered_cat_X,susceptiblecaty=susceptible_cat_Y,infectedcaty=infected_cat_Y,recoveredcaty=recovered_cat_Y)
     else:
         return render_template("inputs.html")
 
