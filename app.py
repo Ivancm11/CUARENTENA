@@ -7,7 +7,7 @@ os.environ["FLASK_ENV"]="deployment"
 app = Flask(__name__, static_folder='static', static_url_path='')
 
 class Simulator():
-    def __init__(self, population, names, sizes, UCI, region_first_infected, infection_radius, hygiene=0.2):
+    def __init__(self, population, names, sizes, UCI, region_first_infected, infection_radius, hygiene=0.4):
         self.regions = dict()
 
         self.hygiene = hygiene
@@ -297,7 +297,7 @@ def agent(state):
 
 
 def model():
-    population = [50, 50, 50]
+    population = [100,100,100]
     names = ['CAT', 'MAD', 'AND']
     sizes = [90, 100, 90]
     
