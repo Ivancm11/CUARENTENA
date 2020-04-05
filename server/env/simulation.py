@@ -1,11 +1,12 @@
 import numpy as np
 import json
+
 from viz import VizEnv
 
 import matplotlib.pyplot as plt
 
 class Simulator():
-    def __init__(self, population, names, sizes, UCI, region_first_infected, infection_radius, hygiene=0.2):
+    def __init__(self, population, names, sizes, UCI, region_first_infected, infection_radius, hygiene=0.5):
         self.regions = dict()
 
         self.hygiene = hygiene
@@ -121,16 +122,15 @@ class Simulator():
 
             self.regions[reg_k]['S'] -= n_infected #np.sum(infected)
             self.regions[reg_k]['I'] += n_infected #np.sum(infected)
-
-            print(n_infected)
             
             if 'infection_time' not in self.regions[reg_k].keys():
                 self.regions[reg_k]['infection_time'] = np.zeros(n_infected)
             else:
                 self.regions[reg_k]['infection_time'] = np.concatenate([self.regions[reg_k]['infection_time'], np.zeros(n_infected)])
+            
             self.regions[reg_k]['infection_time'] += 1
 
-            steps_removed = 17
+            steps_removed = 20
             cured_or_dead = self.regions[reg_k]['infection_time'] > steps_removed
 
             n_removed = np.sum(cured_or_dead)
@@ -153,7 +153,7 @@ class Simulator():
 
             # transition to other regions (if allowed)
             if not reg_v['isolated']:
-                max_travelers = int((self.regions[reg_k]['S'] + self.regions[reg_k]['I'] + self.regions[reg_k]['R'])*0.01) # only 1% 
+                max_travelers = int((self.regions[reg_k]['S'] + self.regions[reg_k]['I'] + self.regions[reg_k]['R'])*0.05) # only 1% 
                 travelers = np.random.randint(low=0, high=max_travelers) # max travelers
                 label = ['S', 'I', 'R']
 
@@ -184,6 +184,7 @@ class Simulator():
         total_I = 0
         total_R = 0
         self.i += 1
+        
         return self.regions
 
     def get_state(self):
@@ -199,7 +200,7 @@ class Simulator():
         size_isolated = sum([reg_v['isolated']*reg_v['size'] for reg_v in self.regions.values()])
 
         uci = np.array([reg_v['uci'] for reg_v in self.regions.values()])
-        infected = np.array([reg_v['uci'] for reg_v in self.regions.values()])
+        infected = np.array([reg_v['I'] for reg_v in self.regions.values()])
 
         mortality = np.mean(infected/uci) # a function of remaining UCI
 
@@ -207,11 +208,48 @@ class Simulator():
             terminal = 1
             r = 100
 
-        print( mortality, np.mean(infected) , size_isolated)
+        r -= (mortality + np.mean(infected) + size_isolated)
 
-        r += mortality + np.mean(infected) + size_isolated
+        return r, terminal        
 
-        return r, terminal
+    def action(self, action):
+        self.hygiene = action[0]
+        self.radius = action[1]
+
+        for i in range(3):
+            self.regions[i]['isolation'] = action[i+2]
+
+        for i in range(0, 4*3, 3):
+            self.regions[i]['policy'] = action[i+5:i+8]
+
+    def fill_queue(self, agent, queue):
+            self.step()
+
+            total_S = 0
+            total_I = 0
+            total_R = 0
+
+            while total_R == 0 or total_I != 0:
+                total_S = 0
+                total_I = 0
+                total_R = 0
+
+                state = self.get_state()
+                reward, terminal = self.get_reward_terminal()
+
+                print('Reward: ', reward)
+
+                actions = agent(state) # self.hygiene (0), self.radius, isolation (for region), p (region)
+                                    # state self.S, self.I, self.R for regions
+
+                self.step()
+
+                next_state = self.get_state()
+                
+                for i, reg_v in enumerate(self.regions.values()):
+                    total_S += reg_v['S']
+                    total_I += reg_v['I']
+                    total_R += reg_v['R']
 
     def simulate(self, agent):
         total_S = 0
@@ -235,7 +273,7 @@ class Simulator():
                 }
             }
 
-        while total_R == 0 or total_I != 0:
+        while total_R < 50 or total_I > 5:
             total_S = 0
             total_I = 0
             total_R = 0
@@ -277,27 +315,24 @@ class Simulator():
         plt.legend(['Susceptible', 'Infected', 'Removed'])
         plt.savefig('curve.png', dpi=300)
         plt.show()
-        
 
         return regions_resumed
 
 def agent(state):
-    print(state)
     return []
 
 if __name__ == '__main__':
-    population = [700, 100, 100, 100]
-    names = ['CAT', 'MAD', 'AND', 'RIOJA']
-    sizes = [90, 100, 90, 100]
+    population = [100, 100, 100]
+    names = ['CAT', 'MAD', 'AND']
+    sizes = [90, 100, 90]
     
-    UCI = [9, 10, 9, 10]
+    UCI = [9, 10, 9]
 
-    sim = Simulator(population, names, sizes, UCI, 0, 1, 0.3)
+    sim = Simulator(population, names, sizes, UCI, 0, 2, 0.3)
     sim.step()
-    json_str = sim.simulate(agent)
+    resume = sim.simulate(agent)
     
-    with open('sim.json', '+w') as f:
-        f.write(json_str)
+
     # n_rows = 2
     # n_columns = 2 #int(np.ceil(len(population)/n_rows))
 
@@ -305,3 +340,5 @@ if __name__ == '__main__':
     # vis.show(100)
 
 
+
+    
