@@ -388,7 +388,7 @@ def login():
 
 
 
-        return render_template('index.html',data_aux=json_data,susceptible=Susceptible,infected=Infected,recovered=Recovered,x_pos=X_Cat,susceptiblecatx=susceptible_cat_X,infectedcatx=infected_cat_X,recoveredcatx=recovered_cat_X,susceptiblecaty=susceptible_cat_Y,infectedcaty=infected_cat_Y,recoveredcaty=recovered_cat_Y)
+        return render_template('index.html',data_aux=json_data,susceptible=Susceptible,infected=Infected,recovered=Recovered,x_pos=X_Cat,susceptiblecatx=Susceptible_cat_X,infectedcatx=Infected_cat_X,recoveredcatx=Recovered_cat_X,susceptiblecaty=Susceptible_cat_Y,infectedcaty=Infected_cat_Y,recoveredcaty=Recovered_cat_Y)
     else:
         return render_template("inputs.html")
 
