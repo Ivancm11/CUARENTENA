@@ -155,17 +155,23 @@
         <script id="DataSusceptible">
           {{susceptible_cat}}
         </script>
-          <script id="DataInfected">
-            {{infected_cat}}
-          </script>
-            <script id="DataRecovered">
-              {{recovered_cat}}
-            </script>
+        <script id="DataInfected">
+          {{infected_cat}}
+        </script>
+        <script id="DataRecovered">
+          {{recovered_cat}}
+        </script>
 
         <script id="graficos">
-          var susceptibleData =[15,11, 9,8,7,15,16,23,40,77,100];
-          var infectedData =[0,4,6,5,2,15,16,23,40,77,100];
-          var removedData =[0,0,0,1,5,5,16,23,40,77,100];
+          //var susceptibleData =[15,11, 9,8,7,15,16,23,40,77,100];
+          //var infectedData =[0,4,6,5,2,15,16,23,40,77,100];
+          //var removedData =[0,0,0,1,5,5,16,23,40,77,100];
+          var susceptibleData = JSON.parse('{"test":'+document.getElementById("DataSusceptible").innerHTML+'}');
+          susceptibleData=susceptibleData['test']
+          var infectedData = JSON.parse('{"test":'+document.getElementById("DataInfected").innerHTML+'}');
+          infectedData=infectedData['test']
+          var removedData = JSON.parse('{"test":'+document.getElementById("DataRecovered").innerHTML+'}');
+          removedData=removedData['test']
           var inputData = document.getElementById("JSONData").innerHTML;
           var n = 2;
           var x = [], y = [], z = [],xx=[],yy=[];
@@ -376,7 +382,7 @@
           var data = [
             {
               x: ['Susceptible', 'Infected', 'Removed'],
-              y: [20, 14,23],
+              y: [700, 700,700],
               type: 'bar',
               marker: {
                 color: 'rgb(150,150,150)'
@@ -414,10 +420,20 @@
             };
             var testColor = ['rgba(200,200,200,1)','rgba(66,66,66,1)','rgba(150,150,150,1)']
             var layout_update = {
-                plot_bgcolor: testColor[iter], // updates the title
+                //plot_bgcolor: testColor[1], // updates the title
+                title : 'Valencia day: '+iter,
             };
-            //Plotly.update('myDiv3', data_update, layout_update,0);
-
+            var layout_update2 = {
+                //plot_bgcolor: testColor[1], // updates the title
+                title : 'Catalunya day: '+iter,
+            };
+            var layout_update3 = {
+                //plot_bgcolor: testColor[1], // updates the title
+                title : 'Andalucia day: '+iter,
+            };
+            Plotly.update('myDiv', data_update, layout_update,0);
+            Plotly.update('myDiv2', data_update, layout_update2,0);
+            Plotly.update('myDiv3', data_update, layout_update3,0);
           }
 
           function readJSON(json){
@@ -436,7 +452,7 @@
           function update () {
             computeV2(iter);
             iter = iter+1;
-            if(iter == 5){
+            if(iter == 250){
               iter = 0;
             }
             Plotly.animate('myDiv', {
@@ -489,7 +505,6 @@
     
           requestAnimationFrame(update);
         </script>
-        
       </div>
       <!-- Footer -->
       <footer class="sticky-footer bg-white">
