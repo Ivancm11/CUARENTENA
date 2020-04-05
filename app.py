@@ -362,7 +362,7 @@ def login():
         Susceptible=list(Susceptible)
         Infected=list(Infected)
         Recovered=list(Recovered)
-        X_Cat=json_data[0]['pos']['x'])
+        X_Cat=json_data[0]['pos']['x']
 
 
         return render_template('index.html',data_aux=json_data,susceptible=Susceptible,infected=Infected,recovered=Recovered,x_pos=X_Cat)
