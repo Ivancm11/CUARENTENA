@@ -170,6 +170,7 @@
           var n = 2;
           var x = [], y = [], z = [],xx=[],yy=[];
           var susceptibleAndX = [], susceptibleAndY=[], infectedAndX =[], infectedAndY=[], removedAndX = [], removedAndY=[];
+          var susceptibleCatX = [], susceptibleCatY=[], infectedCatX =[], infectedCatY=[], removedCatX = [], removedCatY=[];
           var susceptible=0,infected=0,removed=0;
           var dt = 0.015;
     
@@ -185,52 +186,24 @@
             infectedAndY[i] = 0;
             removedAndX[i] = 0;
             removedAndY[i] = 0;
+            susceptibleCatX[i] = 0;
+            susceptibleCatY[i] = 0;
+            infectedCatX[i] = 0;
+            infectedCatY[i] = 0;
+            removedCatX[i] = 0;
+            removedCatY[i] = 0;
             susceptible = 0;
             infected = 0;
             removed= 0;
           }
-    
           Plotly.newPlot('myDiv', [{
-            x: x,
-            y: z,
-            mode: 'markers'
-          }], {
-            xaxis: {range: [-40, 40]},
-            yaxis: {range: [0, 60]},
-            title: {
-                text:'Valencia',
-                font: {
-                  family: 'Courier New, monospace',
-                  size: 24
-              },
-              }
-          })
-
-          Plotly.newPlot('myDiv2', [{
-            x: x,
-            y: z,
-            mode: 'markers'
-          }], {
-            xaxis: {range: [-40, 40]},
-            yaxis: {range: [0, 60]},
-            title: {
-                text:'Catalunya',
-                font: {
-                  family: 'Courier New, monospace',
-                  size: 24
-              },
-              }
-          })
-
-          
-          Plotly.newPlot('myDiv3', [{
             x: susceptibleAndX,
             y: susceptibleAndY,
             name : 'Infected',
             mode: 'markers',
             marker: {
               color: 'rgb(250,128,114)',
-              size: 14,
+              size: 7,
               line: {
                 color: 'rgb(0, 0, 0)',
                 width: 2
@@ -244,7 +217,7 @@
             mode: 'markers',
             marker: {
               color: 'rgb(81, 193, 46)',
-              size: 14,
+              size: 7,
               line: {
                 color: 'rgb(0, 0, 0)',
                 width: 2
@@ -258,7 +231,130 @@
             name : 'Removed',
             marker: {
               color: 'rgb(25, 25, 25)',
-              size: 14,
+              size: 7,
+              line: {
+                color: 'rgb(0, 0, 0)',
+                width: 2
+              }
+            },
+          },], {
+            xaxis: {range: [-40, 40]},
+            yaxis: {range: [0, 60]},
+            title: {
+                text:'Valencia',
+                font: {
+                  family: 'Courier New, monospace',
+                  size: 24
+              },
+            },
+            plot_bgcolor : 'rgba(41, 241, 195, 1)',
+          })
+          /*Plotly.newPlot('myDiv', [{
+            x: x,
+            y: z,
+            mode: 'markers'
+          }], {
+            xaxis: {range: [-40, 40]},
+            yaxis: {range: [0, 60]},
+            title: {
+                text:'Valencia',
+                font: {
+                  family: 'Courier New, monospace',
+                  size: 24
+              },
+              }
+          })*/
+
+          Plotly.newPlot('myDiv2', [{
+            x: susceptibleAndX,
+            y: susceptibleAndY,
+            name : 'Infected',
+            mode: 'markers',
+            marker: {
+              color: 'rgb(250,128,114)',
+              size: 7,
+              line: {
+                color: 'rgb(0, 0, 0)',
+                width: 2
+              }
+            },
+          },
+          {
+            x: x,
+            y: [2],
+            name : 'Susceptible',
+            mode: 'markers',
+            marker: {
+              color: 'rgb(81, 193, 46)',
+              size: 7,
+              line: {
+                color: 'rgb(0, 0, 0)',
+                width: 2
+              }
+            },
+          },
+          {
+            x: x,
+            y: [2],
+            mode: 'markers',
+            name : 'Removed',
+            marker: {
+              color: 'rgb(25, 25, 25)',
+              size: 7,
+              line: {
+                color: 'rgb(0, 0, 0)',
+                width: 2
+              }
+            },
+          },], {
+            xaxis: {range: [-40, 40]},
+            yaxis: {range: [0, 60]},
+            title: {
+                text:'Catalunya',
+                font: {
+                  family: 'Courier New, monospace',
+                  size: 24
+              },
+            },
+            plot_bgcolor : 'rgba(41, 241, 195, 1)',
+          })
+          
+          Plotly.newPlot('myDiv3', [{
+            x: susceptibleAndX,
+            y: susceptibleAndY,
+            name : 'Infected',
+            mode: 'markers',
+            marker: {
+              color: 'rgb(250,128,114)',
+              size: 7,
+              line: {
+                color: 'rgb(0, 0, 0)',
+                width: 2
+              }
+            },
+          },
+          {
+            x: x,
+            y: [2],
+            name : 'Susceptible',
+            mode: 'markers',
+            marker: {
+              color: 'rgb(81, 193, 46)',
+              size: 7,
+              line: {
+                color: 'rgb(0, 0, 0)',
+                width: 2
+              }
+            },
+          },
+          {
+            x: x,
+            y: [2],
+            mode: 'markers',
+            name : 'Removed',
+            marker: {
+              color: 'rgb(25, 25, 25)',
+              size: 7,
               line: {
                 color: 'rgb(0, 0, 0)',
                 width: 2
@@ -273,7 +369,8 @@
                   family: 'Courier New, monospace',
                   size: 24
               },
-              }
+            },
+            plot_bgcolor : 'rgba(41, 241, 195, 1)',
           })
 
           var data = [
@@ -296,16 +393,30 @@
             for(var i = 0; i < n; i++){
               xx[i] = puntosX[i][iter];
               yy[i] = puntosY[i][iter];
-              susceptibleAndX = [Math.random()*25*(Math.round(Math.random()) * 2 - 1),Math.random()*25*(Math.round(Math.random()) * 2 - 1)];
-              susceptibleAndY = [Math.random()*40,Math.random()*40];
+              susceptibleAndX = [Math.random()*25*(Math.round(Math.random()) * 2 - 1),Math.random()*25*(Math.round(Math.random()) * 2 - 1),Math.random()*25*(Math.round(Math.random()) * 2 - 1),Math.random()*25*(Math.round(Math.random()) * 2 - 1),Math.random()*25*(Math.round(Math.random()) * 2 - 1),Math.random()*25*(Math.round(Math.random()) * 2 - 1),Math.random()*25*(Math.round(Math.random()) * 2 - 1),Math.random()*25*(Math.round(Math.random()) * 2 - 1),Math.random()*25*(Math.round(Math.random()) * 2 - 1),Math.random()*25*(Math.round(Math.random()) * 2 - 1),Math.random()*25*(Math.round(Math.random()) * 2 - 1),Math.random()*25*(Math.round(Math.random()) * 2 - 1)];
+              susceptibleAndY = [Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40];
               infectedAndX = [Math.random()*25*(Math.round(Math.random()) * 2 - 1),Math.random()*25*(Math.round(Math.random()) * 2 - 1)];
               infectedAndY = [Math.random()*40,Math.random()*40];
               removedAndX = [Math.random()*25*(Math.round(Math.random()) * 2 - 1),Math.random()*25*(Math.round(Math.random()) * 2 - 1)];
               removedAndY = [Math.random()*40,Math.random()*40];
+              susceptibleCatX = [Math.random()*25*(Math.round(Math.random()) * 2 - 1),Math.random()*25*(Math.round(Math.random()) * 2 - 1),Math.random()*25*(Math.round(Math.random()) * 2 - 1),Math.random()*25*(Math.round(Math.random()) * 2 - 1),Math.random()*25*(Math.round(Math.random()) * 2 - 1),Math.random()*25*(Math.round(Math.random()) * 2 - 1),Math.random()*25*(Math.round(Math.random()) * 2 - 1),Math.random()*25*(Math.round(Math.random()) * 2 - 1),Math.random()*25*(Math.round(Math.random()) * 2 - 1),Math.random()*25*(Math.round(Math.random()) * 2 - 1),Math.random()*25*(Math.round(Math.random()) * 2 - 1),Math.random()*25*(Math.round(Math.random()) * 2 - 1)];
+              susceptibleCatY = [Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40,Math.random()*40];
+              infectedCatX = [Math.random()*25*(Math.round(Math.random()) * 2 - 1),Math.random()*25*(Math.round(Math.random()) * 2 - 1)];
+              infectedCatY = [Math.random()*40,Math.random()*40];
+              removedCatX = [Math.random()*25*(Math.round(Math.random()) * 2 - 1),Math.random()*25*(Math.round(Math.random()) * 2 - 1)];
+              removedCatY = [Math.random()*40,Math.random()*40];
               susceptible = susceptibleData[iter];
               infected = infectedData[iter];
               removed = removedData[iter];
             }   
+            var data_update = {
+                'marker.color': 'red'
+            };
+            var testColor = ['rgba(200,200,200,1)','rgba(66,66,66,1)','rgba(150,150,150,1)']
+            var layout_update = {
+                plot_bgcolor: testColor[iter], // updates the title
+            };
+            //Plotly.update('myDiv3', data_update, layout_update,0);
 
           }
 
@@ -335,19 +446,19 @@
                 duration: 0
               },
               frame: {
-                duration: 10,
+                duration: 120,
                 redraw: false
               },
 
             });
             Plotly.animate('myDiv2', {
-              data: [{x: xx, y: yy}]
+              data: [{x: susceptibleCatX, y: susceptibleCatY},{x:infectedCatX,y:infectedCatY}, {x: removedCatX, y: removedCatY}]
             }, {
               transition: {
                 duration: 0
               },
               frame: {
-                duration: 100,
+                duration: 120,
                 redraw: false
               }
             });
