@@ -2,17 +2,19 @@ import numpy as np
 import json
 
 from viz import VizEnv
+from agent import Agent
 
 import matplotlib.pyplot as plt
 
 import time
 
 class Simulator():
-    def __init__(self, population, names, sizes, UCI, region_first_infected, infection_radius, hygiene=0.5):
+    def __init__(self, population, names, sizes, UCI, region_first_infected, infection_radius, hygiene=0.5, viz=True):
         self.regions = dict()
 
         self.hygiene = hygiene
         self.infection_radius = infection_radius
+        self.actions_log = []
 
         for r in range(len(population)):
             self.n_small = 20
@@ -55,8 +57,10 @@ class Simulator():
                     
         # add infected
         self.regions[region_first_infected]['I'] = 1
-        self.get_contourf()
         self.i = 0
+        
+        if viz:
+            self.get_contourf()
 
     def mixture(self, means, sigmas, probs, n_samples):
         data = np.zeros((n_samples, 2))
@@ -215,11 +219,13 @@ class Simulator():
 
         return r, terminal        
 
-    def action(self, action):
+    def take_actions(self, action):
         self.hygiene = action[0]
         self.radius = action[1]
         n_regions = len(self.regions) 
         offset = n_regions + 2
+
+        s = []
         
         for i in range(len(self.regions)):
             self.regions[i]['isolation'] = action[i+2]    
@@ -233,6 +239,10 @@ class Simulator():
             self.regions[i]['policy'][self.n_big] = prob[2]
 
             self.regions[i]['policy'] /= np.sum(self.regions[i]['policy'])
+
+            s.append((self.regions[i]['isolation'] + self.regions[i]['policy'] == 1.0/3) > 0) # policy different from default applied?
+
+        self.actions_log.append(s) # add to 
 
     def fill_queue(self, agent, queue):
             self.step()
@@ -254,8 +264,9 @@ class Simulator():
 
                 action = agent(state) # self.hygiene (0), self.radius, isolation (for region), p (region)
                                     # state self.S, self.I, self.R for regions
-                #print("Action: ", str(action))
-                self.action(action)
+
+                self.take_actions(action)
+                
                 self.step()
                 reward, terminal = self.get_reward_terminal()
                 total_reward += reward
@@ -272,6 +283,8 @@ class Simulator():
                 #print(total_S, total_I, total_R)
                 i+=1        
             return total_reward/i
+
+
     def simulate(self, agent):
         total_S = 0
         total_I = 1
@@ -295,7 +308,9 @@ class Simulator():
                     'state':[]
                 }
             }
+        
         c=0
+
         while total_I > 0:
             total_S = 0
             total_I = 0
@@ -303,10 +318,11 @@ class Simulator():
 
             state = self.get_state()
             reward, terminal = self.get_reward_terminal()
+            
             if agent:
                 actions = agent(state) # self.hygiene (0), self.radius, isolation (for region), p (region)
                                    # state self.S, self.I, self.R for regions
-
+                self.take_actions(actions)
             # TODO: Modify params
 
             self.step()
@@ -339,22 +355,25 @@ class Simulator():
         
         return regions_resumed
 
-def agent(state):
-    return []
 
 if __name__ == '__main__':
-    population = [150, 150, 150]
-    names = ['CAT', 'MAD', 'AND']
-    sizes = [45, 50, 45]
-    
-    UCI = [9, 10, 9]
+    agent_ = Agent()
+    agent_.load()
+    agent_ = agent_.run
 
-    now = time.time()
-    sim = Simulator(population, names, sizes, UCI, 0, 2, 0.5)
-    sim.step()
-    resume = sim.simulate(agent)
-    print("Time: %.3f" % (time.time()- now))
-    
+    for agent in (agent_, None):
+        population = [150, 150, 150]
+        names = ['CAT', 'MAD', 'AND']
+        sizes = [45, 50, 45]
+        
+        UCI = [9, 10, 9]
+
+        now = time.time()
+        sim = Simulator(population, names, sizes, UCI, 0, 2, 0.5, viz=True)
+        sim.step()
+        resume = sim.simulate(agent)
+        print("Time: %.3f" % (time.time()- now))
+        
 
     # n_rows = 2
     # n_columns = 2 #int(np.ceil(len(population)/n_rows))

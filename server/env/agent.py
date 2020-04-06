@@ -4,8 +4,6 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from simulation import Simulator
-
 class ReplayBuffer(object):
     def __init__(self, size):
         self.size = size
@@ -39,11 +37,18 @@ class QFunctionNetwork(nn.Module):
     def __init__(self, n_states, n_actions):
         super(QFunctionNetwork, self).__init__()
         self.linear1 = nn.Linear(n_states + n_actions, 5)
-        self.linear2 = nn.Linear(5, 1)
+        self.linear2 = nn.Linear(5, 10)
+        self.linear3 = nn.Linear(10, 10)
+        self.linear4 = nn.Linear(10, 5)
+        self.linear5 = nn.Linear(5, 1)
 
     def forward(self, input):
         output = F.relu(self.linear1(input))
-        return self.linear2(output)
+        output = F.relu(self.linear2(output))
+        output = F.relu(self.linear3(output))
+        output = F.relu(self.linear4(output))
+
+        return self.linear5(output)
 
 # QFunction -> in_features: state, action; out_features: E[sum(future outcomes)]
 
@@ -151,43 +156,24 @@ class Agent():
         self.QFunctionTarget.load_state_dict(self.QFunction.state_dict())
 
     def run(self, state):
-        action = self.select_action(state, 0) # fully deterministic
-        return action
-
+        with torch.no_grad():
+                state = torch.tensor(state)*torch.ones((self.actions.shape[0], 1))
+                state_action = torch.cat((state , self.actions), 1)
+                
+                Q = self.QFunctionTarget(state_action.view(state_action.shape[0], 1, state_action.shape[1]))
+                id_action = torch.argmax(Q)
+                
+                action = state_action.squeeze()[id_action,9:] 
+        return action.numpy()
     def save(self, filename='model'):
         torch.save(self.QFunction.state_dict(), filename)
+        torch.save(self.QFunctionTarget.state_dict(), filename+'target')
+
     
     def load(self, filename='model'):
         self.QFunction.load_state_dict(torch.load(filename))
+        self.QFunctionTarget.load_state_dict(torch.load(filename+'target'))
 
-
-if __name__ == '__main__':
-    a = Agent()
-    q = ReplayBuffer(100)
-
-    #print(a.select_action([100, 100,100, 100, 11, 0, 2,3,4]))
-
-    for i in range(100):
-        population = [100, 90, 90]
-        
-        names = ['CAT', 'MAD', 'AND']
-        sizes = [90, 100, 90]
-        UCI = [9, 10, 9]
-
-        print("Simulating")
-        sim = Simulator(population, names, sizes, UCI, 0, 2, 0.2)
-        total_reward = sim.fill_queue(lambda state: a.select_action(state, i), q)
-        print("Sim Done")
-
-        print("Mean Reward: ", total_reward)
-        a.fit(q, 100, 0.9)
-        print("Fit Done")
-
-        if i%10 == 0:
-            print("%i - Updating" % i)
-            a.update_target()
-    
-    a.save()
 
 
 
