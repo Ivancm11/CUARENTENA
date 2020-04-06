@@ -598,8 +598,8 @@
           function update () {
             computeV2(iter);
             iter = iter+1;
-            if(iter == xSusceptibleC.length){
-              iter = 0;
+            if(iter >= xSusceptibleC.length){
+              iter = xSusceptibleC.length;
             }
             Plotly.animate('myDiv', {
               data: [{x: infectedValX, y: susceptibleValY},{x:susceptibleValX,y:susceptibleValY}, {x: removedValX, y: removedValY}]
@@ -608,7 +608,7 @@
                 duration: 0
               },
               frame: {
-                duration: 120,
+                duration: 250,
                 redraw: false
               },
 
@@ -620,7 +620,7 @@
                 duration: 0
               },
               frame: {
-                duration: 120,
+                duration: 250,
                 redraw: false
               }
             });
@@ -631,7 +631,7 @@
                 duration: 0
               },
               frame: {
-                duration: 120,
+                duration: 250,
                 redraw: false
               }
             });
