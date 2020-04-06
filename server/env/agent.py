@@ -17,7 +17,7 @@ class ReplayBuffer(object):
             Save transition
             Input must be arrays
         """
-        transition = state + [action, reward] + next_state + [terminal_state]
+        transition = state + action + [reward] + next_state + [terminal_state]
 
         if len(self.buffer) < self.size:
             self.buffer.append(transition)
@@ -36,9 +36,9 @@ class ReplayBuffer(object):
         return len(self.buffer)
 
 class QFunctionNetwork(nn.Module):
-    def __init__(self):
+    def __init__(self, n_states, n_actions):
         super(QFunctionNetwork, self).__init__()
-        self.linear1 = nn.Linear(3, 5)
+        self.linear1 = nn.Linear(n_states + n_actions, 5)
         self.linear2 = nn.Linear(5, 1)
 
     def forward(self, input):
@@ -46,26 +46,166 @@ class QFunctionNetwork(nn.Module):
         return self.linear2(output)
 
 # QFunction -> in_features: state, action; out_features: E[sum(future outcomes)]
-QFunction = QFunctionNetwork()
-QFunctionTarget = QFunctionNetwork()
-
 
 class Agent():
     def __init__(self):
-        pass
+        self.gamma = 0.9
+        self.batch_size = 30
+            
+        self.get_possible_actions()
+
+        self.QFunction = QFunctionNetwork(3*3, 14)
+        self.QFunctionTarget = QFunctionNetwork(3*3, 14)
+        self.QFunctionTarget.load_state_dict(self.QFunction.state_dict())
+        self.QFunctionTarget.eval()
+        
+        self.optimizer = torch.optim.Adam(self.QFunction.parameters(), lr=0.001)
+        self.mse_criterion = nn.MSELoss()
+    
+    # def get_expected_Q(self, state, action, reward, next_state, terminal):
+    #     with torch.no_grad():
+    #         state_action = torch.cat((state , action), 1)
+    #             Q = self.QFunction(state_action.view(state_action.shape[0], 1, state_action.shape[1]))
+    #         Q = self.QFunction()
+
+
+    def get_possible_actions(self):
+        valid = []
+        
+        valid.append([0.2, 0.15, 0.1, 0.25])
+        valid.append([2, 3])
+        valid.append([[False, False, False], [True, False, False], [False, True, False], [True, True, False],[False, False, True], [True, False, True], [False, True, True], [True, True, True]])
+        valid.append([[1,1,1], [1,1,0], [1,0,0]])
+        valid.append([[1,1,1], [1,1,0], [1,0,0]])
+        valid.append([[1,1,1], [1,1,0], [1,0,0]])
+        
+        n_degrees = [len(v)-1 for v in valid]
+        
+        self.combinations = []
+        counter = [0,0,0,0,0,0]
+        i = 0
+
+        while counter != n_degrees:
+            for j in range(len(counter)-1):
+                if counter[j] == n_degrees[j] + 1:
+                    counter[j] = 0
+                    counter[j+1] += 1
+                elif counter[j] == n_degrees[j] + 2:
+                    counter[j] = 1
+                    counter[j+1] += 1
+            i+=1
+            self.combinations.append(counter.copy())
+            counter[0] += 1
+        
+        self.actions = []
+
+        for c in self.combinations:
+            self.actions.append([valid[0][c[0]]] + [valid[1][c[1]]]  + valid[2][c[2]]  + valid[3][c[3]]  + valid[4][c[4]]  + valid[5][c[5]])
+
+        self.actions = torch.tensor(self.actions)
+
+    def random_action(self, n_actions):
+        rows = self.actions.shape[0]
+        ids = np.random.randint(rows, size=n_actions)
+        return self.actions[ids, :].squeeze()
+
+    def select_action(self, state, step):      
+        coin = np.random.random()
+
+        self.exploration = 0.9*np.exp(-1.0*step/50) + 0.05 # params from pytorch tutorial
+
+        if coin < self.exploration:
+            # random action
+            action = self.random_action(1)
+        else:
+            with torch.no_grad():
+                state = torch.tensor(state)*torch.ones((self.actions.shape[0], 1))
+                state_action = torch.cat((state , self.actions), 1)
+                
+                Q = self.QFunction(state_action.view(state_action.shape[0], 1, state_action.shape[1]))
+                id_action = torch.argmax(Q)
+                
+                action = state_action.squeeze()[id_action,9:] 
+        return action.numpy()
+
+    def fit(self, queue, batch_size, gamma):
+        batch = queue.sample(batch_size)
+
+        name2col = {"s": list(range(0,9)), "a": list(range(9, 23)), "r": 23, "s'": list(range(24, 33)), "d": 33}
+                
+        state = batch[:, :, name2col["s"]]    
+        next_states = batch[:,:,name2col["s'"]]
+        actions = batch[:,:,name2col["a"]]
+        
+        state_action = torch.cat((next_states, actions), 2)
+        
+        Q = self.QFunction(state_action).squeeze()
+        ExpectedQ = batch[:, :, name2col['r']].squeeze() + gamma*(1-batch[:, :, name2col['d']].squeeze())*self.QFunctionTarget(state_action).squeeze()
+
+        self.optimizer.zero_grad()
+        loss = self.mse_criterion(Q, ExpectedQ)
+        loss.backward()
+        self.optimizer.step()
+
+    def update_target(self):
+        self.QFunctionTarget.load_state_dict(self.QFunction.state_dict())
+
     def run(self, state):
-        return []
+        action = self.select_action(state, 0) # fully deterministic
+        return action
+
+    def save(self, filename='model'):
+        torch.save(self.QFunction.state_dict(), filename)
+    
+    def load(self, filename='model'):
+        self.QFunction.load_state_dict(torch.load(filename))
 
 
 if __name__ == '__main__':
     a = Agent()
-    for i in range(10):
-        population = [700, 100, 100, 100]
-        names = ['CAT', 'MAD', 'AND', 'RIOJA']
-        sizes = [90, 100, 90, 100]
-        
-        UCI = [9, 10, 9, 10]
-        q = BufferError(100)
+    q = ReplayBuffer(100)
 
-        sim = Simulator(population, names, sizes, UCI, 0, 1, 0.3)
-        sim.fill_queue(a.run, q)
+    #print(a.select_action([100, 100,100, 100, 11, 0, 2,3,4]))
+
+    for i in range(100):
+        population = [100, 90, 90]
+        
+        names = ['CAT', 'MAD', 'AND']
+        sizes = [90, 100, 90]
+        UCI = [9, 10, 9]
+
+        print("Simulating")
+        sim = Simulator(population, names, sizes, UCI, 0, 2, 0.2)
+        total_reward = sim.fill_queue(lambda state: a.select_action(state, i), q)
+        print("Sim Done")
+
+        print("Mean Reward: ", total_reward)
+        a.fit(q, 100, 0.9)
+        print("Fit Done")
+
+        if i%10 == 0:
+            print("%i - Updating" % i)
+            a.update_target()
+    
+    a.save()
+
+
+
+# if __name__ == '__main__':
+#     a = Agent()
+#     q = ReplayBuffer(100)
+
+#     #print(a.select_action([100, 100,100, 100, 11, 0, 2,3,4]))
+
+#     for i in range(50):
+#         population = [100, 90, 90]
+        
+#         names = ['CAT', 'MAD', 'AND']
+#         sizes = [90, 100, 90]
+        
+#         UCI = [9, 10, 9]
+
+#         print("Simulating")
+#         sim = Simulator(population, names, sizes, UCI, 0, 2, 0.2)
+#         sim.simulate(None)
+#         print("Sim Done")

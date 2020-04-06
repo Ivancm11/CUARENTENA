@@ -5,6 +5,8 @@ from viz import VizEnv
 
 import matplotlib.pyplot as plt
 
+import time
+
 class Simulator():
     def __init__(self, population, names, sizes, UCI, region_first_infected, infection_radius, hygiene=0.5):
         self.regions = dict()
@@ -13,12 +15,13 @@ class Simulator():
         self.infection_radius = infection_radius
 
         for r in range(len(population)):
-            n_small = 20
-            n_medium = 2
-            n_big = 1
-            n_total = n_small + n_medium + n_big
+            self.n_small = 20
+            self.n_medium = 2
+            self.n_big = 1
+            
+            self.n_total = self.n_small + self.n_medium + self.n_big
 
-            mean = np.random.uniform(low=0, high=sizes[r], size=(n_total, 2))
+            mean = np.random.uniform(low=0, high=sizes[r], size=(self.n_total, 2))
 
             surface_population =  np.sqrt(population[r]/sizes[r])
 
@@ -27,7 +30,7 @@ class Simulator():
             d_medium = surface_population*1
             d_big = surface_population*0.5
 
-            density = np.array([d_small]*n_small + [d_medium]*n_medium + [d_big]*n_big)
+            density = np.array([d_small]*self.n_small + [d_medium]*self.n_medium + [d_big]*self.n_big)
             
             pos = np.zeros((population[r], 3))
             if r == region_first_infected:
@@ -42,7 +45,7 @@ class Simulator():
                                'size': sizes[r],
                                'centers': mean,
                                'density': density,
-                               'policy': np.ones(n_total)/n_total, # init = uniform
+                               'policy': np.ones(self.n_total)/self.n_total, # init = uniform
                                'isolated': False,
                                'pos': pos
                             }
@@ -215,46 +218,66 @@ class Simulator():
     def action(self, action):
         self.hygiene = action[0]
         self.radius = action[1]
+        n_regions = len(self.regions) 
+        offset = n_regions + 2
+        
+        for i in range(len(self.regions)):
+            self.regions[i]['isolation'] = action[i+2]    
 
-        for i in range(3):
-            self.regions[i]['isolation'] = action[i+2]
+            prob = np.array(action[3*i + offset: 3*i + 3 + offset])
 
-        for i in range(0, 4*3, 3):
-            self.regions[i]['policy'] = action[i+5:i+8]
+            self.regions[i]['policy'] = np.ones(self.n_total)
+            
+            self.regions[i]['policy'][self.n_small] = prob[0]
+            self.regions[i]['policy'][self.n_medium] = prob[1]
+            self.regions[i]['policy'][self.n_big] = prob[2]
+
+            self.regions[i]['policy'] /= np.sum(self.regions[i]['policy'])
 
     def fill_queue(self, agent, queue):
             self.step()
 
             total_S = 0
-            total_I = 0
+            total_I = 1
             total_R = 0
+            i = 0
+            total_reward = 0
 
-            while total_R == 0 or total_I != 0:
+            while total_I > 0:
                 total_S = 0
                 total_I = 0
                 total_R = 0
 
                 state = self.get_state()
-                reward, terminal = self.get_reward_terminal()
 
-                print('Reward: ', reward)
+                #print('Reward: ', reward)
 
-                actions = agent(state) # self.hygiene (0), self.radius, isolation (for region), p (region)
+                action = agent(state) # self.hygiene (0), self.radius, isolation (for region), p (region)
                                     # state self.S, self.I, self.R for regions
-
+                #print("Action: ", str(action))
+                self.action(action)
                 self.step()
+                reward, terminal = self.get_reward_terminal()
+                total_reward += reward
+
 
                 next_state = self.get_state()
-                
-                for i, reg_v in enumerate(self.regions.values()):
+
+                queue.push(state, list(action), reward, next_state, terminal)
+
+                for reg_v in self.regions.values():
                     total_S += reg_v['S']
                     total_I += reg_v['I']
                     total_R += reg_v['R']
-
+                #print(total_S, total_I, total_R)
+                i+=1        
+            return total_reward/i
     def simulate(self, agent):
         total_S = 0
-        total_I = 0
+        total_I = 1
         total_R = 0
+
+        total_reward = 0
 
         regions_resumed = dict()
 
@@ -272,25 +295,22 @@ class Simulator():
                     'state':[]
                 }
             }
-
-        while total_R < 50 or total_I > 5:
+        c=0
+        while total_I > 0:
             total_S = 0
             total_I = 0
             total_R = 0
 
             state = self.get_state()
             reward, terminal = self.get_reward_terminal()
-
-            print(reward)
-
-            actions = agent(state) # self.hygiene (0), self.radius, isolation (for region), p (region)
+            if agent:
+                actions = agent(state) # self.hygiene (0), self.radius, isolation (for region), p (region)
                                    # state self.S, self.I, self.R for regions
 
             # TODO: Modify params
 
             self.step()
-
-            nex_state = self.get_state()
+            total_reward += reward
 
             print('#######' + str(self.i) +'#######')
             for i, reg_v in enumerate(self.regions.values()):
@@ -308,29 +328,32 @@ class Simulator():
 
             print('Total ', total_S, total_I, total_R)
             print('##############')
-        
+            c +=1
+        print(total_reward/c)
         plt.plot(regions_resumed[0]['S'], c='green')
         plt.plot(regions_resumed[0]['I'], c='red')
         plt.plot(regions_resumed[0]['R'], c='black')
         plt.legend(['Susceptible', 'Infected', 'Removed'])
         plt.savefig('curve.png', dpi=300)
         plt.show()
-
+        
         return regions_resumed
 
 def agent(state):
     return []
 
 if __name__ == '__main__':
-    population = [100, 100, 100]
+    population = [150, 150, 150]
     names = ['CAT', 'MAD', 'AND']
-    sizes = [90, 100, 90]
+    sizes = [45, 50, 45]
     
     UCI = [9, 10, 9]
 
-    sim = Simulator(population, names, sizes, UCI, 0, 2, 0.3)
+    now = time.time()
+    sim = Simulator(population, names, sizes, UCI, 0, 2, 0.5)
     sim.step()
     resume = sim.simulate(agent)
+    print("Time: %.3f" % (time.time()- now))
     
 
     # n_rows = 2
@@ -338,7 +361,3 @@ if __name__ == '__main__':
 
     # vis = VizEnv(n_rows, n_columns, sim.regions, sim.step)
     # vis.show(100)
-
-
-
-    
