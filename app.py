@@ -329,17 +329,39 @@ def agent(state):
 #     json_str = sim.simulate(agent)
 
 
-def model():
-    population = [150, 150, 150]
+def model(population_cat,hygiene_cat,icu_cat,iratio_cat,size_cat):
+    population = [population_cat,150,150]
     names = ['CAT', 'MAD', 'AND']
-    sizes = [45, 50, 45]
+    sizes = [size_cat, 50, 45]
+    
+    UCI = [icu_cat, 10, 9]
 
     UCI = [9, 10, 9]
 
-    sim = Simulator(population, names, sizes, UCI, 0, 1, 0.5)
+    sim = Simulator(population, names, sizes, UCI, 0, iratio_cat, hygiene_cat)
     sim.step()
     json_str = sim.simulate(agent)
     return json_str
+
+def get_points(X_Cat,Y_Cat,Susceptible_cat,Infected_cat):
+    Susceptible_cat_X=[]
+    Infected_cat_X=[]
+    Recovered_cat_X=[]
+    Susceptible_cat_Y=[]
+    Infected_cat_Y=[]
+    Recovered_cat_Y=[]
+    for i in range(len(X_Cat)-1):
+        infected_start=Susceptible_cat[i+1]
+        recovered_start=Susceptible_cat[i+1]+Infected_cat[i+1]
+        Susceptible_cat_X.append(X_Cat[i+1][:infected_start])
+        Infected_cat_X.append(X_Cat[i+1][infected_start:recovered_start])
+        Recovered_cat_X.append(X_Cat[i+1][recovered_start:])
+        Susceptible_cat_Y.append(Y_Cat[i+1][:infected_start])
+        Infected_cat_Y.append(Y_Cat[i+1][infected_start:recovered_start])
+        Recovered_cat_Y.append(Y_Cat[i+1][recovered_start:])
+    return Susceptible_cat_X,Infected_cat_X,Recovered_cat_X,Susceptible_cat_Y,Infected_cat_Y,Recovered_cat_Y 
+
+   
 
 
 def get_points(X_Cat, Y_Cat, Susceptible_cat, Infected_cat):
@@ -364,50 +386,46 @@ def get_points(X_Cat, Y_Cat, Susceptible_cat, Infected_cat):
 @app.route("/", methods=["POST", "GET"])
 def login():
     if request.method == "POST":
-        user = request.form["nm"]
-        percentage_aux = request.form["percentage"]
-        capacity_aux = request.form["capacity"]
-        min_infected_aux = request.form["min_infected"]
-        json_data = model()
-        Susceptible = np.zeros(len(json_data[0]['S']))
-        Infected = np.zeros(len(json_data[0]['I']))
-        Recovered = np.zeros(len(json_data[0]['R']))
+        population_cat= int(request.form["population"])
+        hygiene_cat = float(request.form["hygiene"])
+        icu_cat=int(request.form["icu"])
+        iratio_cat=float(request.form["iRatio"])
+        size_cat=int(request.form['size'])
+        json_data=model(population_cat,hygiene_cat,icu_cat,iratio_cat,size_cat)
+        Susceptible=np.zeros(len(json_data[0]['S']))
+        Infected=np.zeros(len(json_data[0]['I']))
+        Recovered=np.zeros(len(json_data[0]['R']))
         for region in json_data.keys():
-            Susceptible += json_data[region]['S']
-            Infected += json_data[region]['I']
-            Recovered += json_data[region]['R']
-        Susceptible = list(Susceptible)
-        Infected = list(Infected)
-        Recovered = list(Recovered)
+            Susceptible+=json_data[region]['S']
+            Infected+=json_data[region]['I']
+            Recovered+=json_data[region]['R']
+        Susceptible=list(Susceptible)
+        Infected=list(Infected)
+        Recovered=list(Recovered)
 
-        Susceptible_cat = json_data[0]['S']
-        Infected_cat = json_data[0]['I']
-        Susceptible_and = json_data[1]['S']
-        Infected_and = json_data[1]['I']
-        Susceptible_val = json_data[2]['S']
-        Infected_val = json_data[2]['I']
-        X_Cat = json_data[0]['pos']['x']
-        Y_Cat = json_data[0]['pos']['y']
-        X_And = json_data[1]['pos']['x']
-        Y_And = json_data[1]['pos']['y']
-        X_Val = json_data[2]['pos']['x']
-        Y_Val = json_data[2]['pos']['y']
-        Susceptible_cat_X, Infected_cat_X, Recovered_cat_X, Susceptible_cat_Y, Infected_cat_Y, Recovered_cat_Y = get_points(
-            X_Cat, Y_Cat, Susceptible_cat, Infected_cat)
-        Susceptible_and_X, Infected_and_X, Recovered_and_X, Susceptible_and_Y, Infected_and_Y, Recovered_and_Y = get_points(
-            X_And, Y_And, Susceptible_and, Infected_and)
-        Susceptible_val_X, Infected_val_X, Recovered_val_X, Susceptible_val_Y, Infected_val_Y, Recovered_val_Y = get_points(
-            X_Val, Y_Val, Susceptible_val, Infected_val)
+        Susceptible_cat=json_data[0]['S']
+        Infected_cat=json_data[0]['I']
+        Susceptible_and=json_data[1]['S']
+        Infected_and=json_data[1]['I']
+        Susceptible_val=json_data[2]['S']
+        Infected_val=json_data[2]['I']
+        X_Cat=json_data[0]['pos']['x']
+        Y_Cat=json_data[0]['pos']['y']
+        X_And=json_data[1]['pos']['x']
+        Y_And=json_data[1]['pos']['y']
+        X_Val=json_data[2]['pos']['x']
+        Y_Val=json_data[2]['pos']['y']
+        Susceptible_cat_X,Infected_cat_X,Recovered_cat_X,Susceptible_cat_Y,Infected_cat_Y,Recovered_cat_Y=get_points(X_Cat,Y_Cat,Susceptible_cat,Infected_cat)
+        Susceptible_and_X,Infected_and_X,Recovered_and_X,Susceptible_and_Y,Infected_and_Y,Recovered_and_Y=get_points(X_And,Y_And,Susceptible_and,Infected_and)
+        Susceptible_val_X,Infected_val_X,Recovered_val_X,Susceptible_val_Y,Infected_val_Y,Recovered_val_Y=get_points(X_Val,Y_Val,Susceptible_val,Infected_val)
 
-        return render_template('index.html', data_aux=json_data, susceptible=Susceptible, infected=Infected,
-                       recovered=Recovered, x_pos=X_Cat, susceptiblecatx=Susceptible_cat_X, infectedcatx=Infected_cat_X,
-                       recoveredcatx=Recovered_cat_X, susceptiblecaty=Susceptible_cat_Y, infectedcaty=Infected_cat_Y,
-                       recoveredcaty=Recovered_cat_Y, susceptibleandx=Susceptible_and_X, infectedandx=Infected_and_X,
-                       recoveredandx=Recovered_and_X, susceptibleandy=Susceptible_and_Y, infectedandy=Infected_and_Y,
-                       recoveredandy=Recovered_and_Y, susceptiblevalx=Susceptible_val_X, infectedvalx=Infected_val_X,
-                       recoveredvalx=Recovered_val_X, susceptiblevaly=Susceptible_val_Y, infectedvaly=Infected_val_Y,
-                       recoveredvaly=Recovered_val_Y)
 
+
+
+
+        return render_template('index.html',data_aux=json_data,susceptible=Susceptible,infected=Infected,recovered=Recovered,x_pos=X_Cat,susceptiblecatx=Susceptible_cat_X,infectedcatx=Infected_cat_X,recoveredcatx=Recovered_cat_X,susceptiblecaty=Susceptible_cat_Y,infectedcaty=Infected_cat_Y,recoveredcaty=Recovered_cat_Y,susceptibleandx=Susceptible_and_X,infectedandx=Infected_and_X,recoveredandx=Recovered_and_X,susceptibleandy=Susceptible_and_Y,infectedandy=Infected_and_Y,recoveredandy=Recovered_and_Y,susceptiblevalx=Susceptible_val_X,infectedvalx=Infected_val_X,recoveredvalx=Recovered_val_X,susceptiblevaly=Susceptible_val_Y,infectedvaly=Infected_val_Y,recoveredvaly=Recovered_val_Y)
+
+        return render_template('index.html',data_aux=json_data,susceptible=Susceptible,infected=Infected,recovered=Recovered,x_pos=X_Cat,susceptiblecatx=Susceptible_cat_X,infectedcatx=Infected_cat_X,recoveredcatx=Recovered_cat_X,susceptiblecaty=Susceptible_cat_Y,infectedcaty=Infected_cat_Y,recoveredcaty=Recovered_cat_Y)
     else:
         return render_template("inputs.html")
 
