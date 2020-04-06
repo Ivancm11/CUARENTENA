@@ -486,13 +486,29 @@
 
           var data = [
             {
-              x: ['Susceptible', 'Infected', 'Removed'],
-              y: [700, 700,700],
+              x: ['Susceptible'],
+              y: [700],
               type: 'bar',
               marker: {
-                color: 'rgb(150,150,150)'
+                color: 'rgba(41, 241, 195, 1)'
               }
-            }
+            },
+            {
+              x: ['Infected'],
+              y: [700],
+              type: 'bar',
+              marker: {
+                color: 'rgba(240, 52, 52, 1)'
+              }
+            },
+            {
+              x: ['Removed'],
+              y: [700],
+              type: 'bar',
+              marker: {
+                color: '#19b5fe '
+              }
+            },
           ];
           var layout = {
             title: 'SIR Data',
@@ -620,13 +636,13 @@
               }
             });
             Plotly.animate('myDiv4', {
-              data: [{y: [susceptible, infected, removed]}]
+              data: [{y: [susceptible]},{y:[infected]},{y:[removed]}]
             }, {
               transition: {
                 duration: 0
               },
               frame: {
-                duration: 500,
+                duration: 95,
                 redraw: false
               }
             });
